@@ -1,5 +1,8 @@
 // src/types/index.ts
 export type RootStackParamList = {
+    // Define the screens that you have in your app
+    Splash: undefined;
+    Onboarding: undefined;
     Home: undefined;
     Summary: undefined;
     Question: undefined;
