@@ -40,9 +40,9 @@ const slides = [
 
 const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const carouselRef = useRef(null);
+  const carouselRef = useRef<Carousel<any> | null>(null);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item, index }: { item: any, index: number }) => {
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.image} />
