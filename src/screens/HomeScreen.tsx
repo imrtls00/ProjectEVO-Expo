@@ -1,9 +1,17 @@
 // src/screens/HomeScreen.tsx
 
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { Button, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
 
-const HomeScreen = () => {
+type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+type Props = {
+  navigation: ScreenNavigationProp;
+};
+
+const HomeScreen : React.FC<Props> = ({ navigation }) => {
   const prompts = [
     { id: '1', text: 'Read a Summary of My Emails' },
     { id: '2', text: 'Schedule a Meeting With Boss' },
