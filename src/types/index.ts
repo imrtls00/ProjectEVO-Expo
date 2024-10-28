@@ -4,6 +4,7 @@ export type RootStackParamList = {
     Splash: undefined;
     Onboarding: undefined;
     Home: undefined;
+    Results: { result: string };
   };
   
   export type UIHierarchy = {

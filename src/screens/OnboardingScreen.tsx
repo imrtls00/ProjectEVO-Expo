@@ -1,9 +1,11 @@
 // src/screens/OnboardingScreen.tsx
+
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native';
-import Carousel from 'react-native-snap-carousel';
+import Carousel from 'react-native-reanimated-carousel';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
+import { colors, size, globalStyles } from '../Styles/globalStyles'; // Import global styles
 
 type OnboardingScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Onboarding'>;
 
@@ -11,7 +13,7 @@ type Props = {
   navigation: OnboardingScreenNavigationProp;
 };
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const slides = [
   {
@@ -35,58 +37,60 @@ const slides = [
     description: 'EVO helps you stay on top of your tasks and goals.',
     buttonText: 'Get Started →',
   }
-  // Add more slides here if needed
 ];
 
 const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const carouselRef = useRef<Carousel<any> | null>(null);
+  const carouselRef = useRef<typeof Carousel | null>(null);
 
   const renderItem = ({ item, index }: { item: any, index: number }) => {
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.image} />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.description}>{item.description}</Text>
+        <View style={styles.bottomContainer}>
+          <View style={styles.paginationContainer}>
+            {slides.map((_, dotIndex) => (
+              <View
+                key={dotIndex}
+                style={[
+                  styles.paginationDot,
+                  dotIndex === activeSlide ? styles.paginationDotActive : null,
+                ]}
+              />
+            ))}
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.description}>{item.description}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              if (index === slides.length - 1) {
+                navigation.navigate('Home');
+              } else {
+                carouselRef.current?.next();
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>{item.buttonText}</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (index === slides.length - 1) {
-              navigation.navigate('Home');
-            } else {
-              carouselRef.current?.snapToNext();
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>{item.buttonText}</Text>
-        </TouchableOpacity>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Carousel
         ref={carouselRef}
+        width={screenWidth}
+        height={screenHeight}
         data={slides}
         renderItem={renderItem}
-        sliderWidth={screenWidth}
-        itemWidth={screenWidth}
         onSnapToItem={(index) => setActiveSlide(index)}
+        pagingEnabled
       />
-      <View style={styles.pagination}>
-        {slides.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.paginationDot,
-              index === activeSlide ? styles.paginationDotActive : null,
-            ]}
-          />
-        ))}
-      </View>
     </View>
   );
 };
@@ -94,53 +98,28 @@ const OnboardingScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#010616',
+    backgroundColor: colors.Background,
+    padding: 24,
+    width: screenWidth,
+    height: screenHeight
   },
   slide: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 40,
   },
   image: {
-    width: screenWidth * 0.8,
-    height: screenWidth * 0.8,
-    resizeMode: 'contain',
+    width: screenWidth,
+    height: screenHeight / 2,
+    resizeMode: 'cover',
   },
-  textContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
+  bottomContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingBottom: 24,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  pagination: {
+  paginationContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
   },
   paginationDot: {
     width: 8,
@@ -150,7 +129,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
   },
   paginationDotActive: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.Theme,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: size['32'],
+    fontWeight: '500',
+    color: colors.Heading,
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: size['32'],
+    color: colors.Text,
+    textAlign: 'left',
+  },
+  button: {
+    backgroundColor: colors.Theme,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

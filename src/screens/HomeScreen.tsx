@@ -1,9 +1,13 @@
 // src/screens/HomeScreen.tsx
 
-import React from 'react';
-import { Button, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, FlatList, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
+import openApp from '../services/openApp';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+import { useNavigation } from '@react-navigation/native';
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -11,47 +15,92 @@ type Props = {
   navigation: ScreenNavigationProp;
 };
 
-const HomeScreen : React.FC<Props> = ({ navigation }) => {
-  const prompts = [
-    { id: '1', text: 'Read a Summary of My Emails' },
-    { id: '2', text: 'Schedule a Meeting With Boss' },
-    { id: '3', text: 'Wake Me Up in 4 hours' },
-  ];
+type Prompt = {
+  id: string;
+  text: string;
+};
+
+const prompts: Prompt[] = [
+  { id: '1', text: 'Read a Summary of My Emails' },
+  { id: '2', text: 'Schedule a Meeting With Boss' },
+  { id: '3', text: 'Wake Me Up in 4 hours' },
+];
+
+const HomeScreen: React.FC<Props> = () => {
+  const [inputValue, setInputValue] = useState<string>('');
+  const navigation = useNavigation();
+
+  const apiKey: string = process.env.API_KEY || 'AIzaSyCyZOLwsKnsZrfujm2HkQr7SQUSfoxeuqQ';
+  const genAI = new GoogleGenerativeAI(apiKey);
+
+  // Function to handle input submission and send to Gemini API
+  const handlePrompt = async () => {
+    if (!inputValue) {
+
+      // Alert user if input is empty
+      return alert('Please enter a prompt before submitting');
+
+      // Speech to Text feature here.
+    }
+
+    try {
+      // Load the Gemini model
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      // Send the prompt (inputValue) to the Gemini API
+      const result = await model.generateContent(inputValue);
+
+      // Navigate to Results screen with the generated result
+      navigation.navigate('Results', { result: result.response.text() });
+    } catch (error) {
+      console.error('Error generating content:', error);
+    }
+  };
+
+  const renderPromptItem = ({ item }: { item: Prompt }) => (
+    <Pressable style={styles.card} onPress={() => setInputValue(item.text)}>
+      <Text style={styles.cardText}>{item.text}</Text>
+    </Pressable>
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Hi! 👋🏼 
-        {'\n'}
-        What can EVO
-        {'\n'}
+        Hi! 👋🏼 {'\n'}
+        What can EVO {'\n'}
         do for you?
       </Text>
 
       <Text style={styles.subHeading}>
         Quick Prompts <Text style={styles.divider}>--------------------------------</Text>
       </Text>
+
       <FlatList
         horizontal
         data={prompts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
-            <Text style={styles.cardText}>{item.text}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={renderPromptItem}
         contentContainerStyle={styles.cardContainer}
       />
+
+      <View style={styles.buttonsContainer}>
+        <Button title="Open WhatsApp" onPress={() => openApp("WhatsApp")} />
+        <Button title="Open Facebook" onPress={() => openApp("Facebook")} />
+        <Button title="Open Instagram" onPress={() => openApp("Instagram")} />
+        <Button title="Open Twitter" onPress={() => openApp("Twitter")} />
+      </View>
 
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="What do you wanna do?"
           placeholderTextColor="#616A73"
+          value={inputValue}
+          onChangeText={setInputValue}
         />
-        <TouchableOpacity style={styles.voiceButton}>
-          <Text style={styles.voiceText}>🎤</Text>
-        </TouchableOpacity>
+        <Pressable style={styles.submitButton} onPress={handlePrompt}>
+          <Text style={styles.submitText}>Submit</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -71,7 +120,6 @@ const styles = StyleSheet.create({
     marginTop: 60,
     marginBottom: 20,
   },
-
   subHeading: {
     color: '#B2B4B9',
     fontSize: 24,
@@ -79,15 +127,11 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginBottom: 20,
   },
-
   divider: {
     color: '#0061FF',
-    height: 2,
-    width: 20,
     marginLeft: 10,
     marginRight: 10,
   },
-
   cardContainer: {
     marginBottom: 20,
   },
@@ -103,6 +147,9 @@ const styles = StyleSheet.create({
     color: '#999FAB',
     fontSize: 20,
     fontWeight: 'medium',
+  },
+  buttonsContainer: {
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -120,15 +167,15 @@ const styles = StyleSheet.create({
     color: '#F0F0F0',
     fontSize: 18,
   },
-  voiceButton: {
+  submitButton: {
     backgroundColor: '#0061FF',
     padding: 16,
     borderRadius: 30,
     marginLeft: 10,
   },
-  voiceText: {
+  submitText: {
     color: '#FFF',
-    fontSize: 20,
+    fontSize: 18,
   },
 });
 
