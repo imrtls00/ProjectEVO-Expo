@@ -5,7 +5,7 @@ import { View, Text, TextInput, Pressable, StyleSheet, FlatList, Button } from '
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types';
 import openApp from '../services/openApp';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -30,8 +30,37 @@ const HomeScreen: React.FC<Props> = () => {
   const [inputValue, setInputValue] = useState<string>('');
   const navigation = useNavigation();
 
-  const apiKey: string = process.env.API_KEY || 'AIzaSyCyZOLwsKnsZrfujm2HkQr7SQUSfoxeuqQ';
+  const apiKey: string = process.env.API_KEY;
   const genAI = new GoogleGenerativeAI(apiKey);
+
+  const schema = {
+    description: "List of actions to be performed",
+    type: SchemaType.ARRAY,
+    items: {
+      type: SchemaType.OBJECT,
+      properties: {
+        actionName: {
+          type: SchemaType.STRING,
+          description: "any of the following",
+          enum: [
+            "SummaryOfEmails", 
+            "SendEmail",
+            "ScheduleMeeting", 
+            "SetAlarm",
+            "TextWhatsApp",
+            "Call",
+            "NotAvailable",
+          ],
+          nullable: false,
+        },
+        message: {
+          type: SchemaType.STRING,
+          description: "Text Response",
+        },
+      },
+      required: ["actionName"],
+    },
+  };
 
   // Function to handle input submission and send to Gemini API
   const handlePrompt = async () => {
@@ -45,7 +74,13 @@ const HomeScreen: React.FC<Props> = () => {
 
     try {
       // Load the Gemini model
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-pro",
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: schema,
+        },
+      });
 
       // Send the prompt (inputValue) to the Gemini API
       const result = await model.generateContent(inputValue);
@@ -82,13 +117,6 @@ const HomeScreen: React.FC<Props> = () => {
         renderItem={renderPromptItem}
         contentContainerStyle={styles.cardContainer}
       />
-
-      <View style={styles.buttonsContainer}>
-        <Button title="Open WhatsApp" onPress={() => openApp("WhatsApp")} />
-        <Button title="Open Facebook" onPress={() => openApp("Facebook")} />
-        <Button title="Open Instagram" onPress={() => openApp("Instagram")} />
-        <Button title="Open Twitter" onPress={() => openApp("Twitter")} />
-      </View>
 
       <View style={styles.inputContainer}>
         <TextInput

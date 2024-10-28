@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.Background,
-    padding: 24,
+    padding: 0,
     width: screenWidth,
     height: screenHeight
   },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
     paddingBottom: 24,
   },
   paginationContainer: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.Theme,
     paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 0,
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
