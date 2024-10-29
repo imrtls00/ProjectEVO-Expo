@@ -64,9 +64,6 @@ export function Button({
       flatListRef.current?.scrollToIndex({ index: flatListIndex.value + 1 });
     } else {
       // Navigate to the next screen
-      console.log("Navigate to the next screen");
-
-      // Replace the placeholder with this code
       navigation.navigate('Home');
     }
   };

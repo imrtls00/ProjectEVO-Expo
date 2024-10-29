@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 
 import * as Font from 'expo-font';
 import { Urbanist_400Regular, Urbanist_500Medium } from '@expo-google-fonts/urbanist';
-import AppLoading from 'expo-app-loading';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -32,11 +31,6 @@ const App: React.FC = () => {
 
     loadFonts();
   }, []);
-
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
   return (
     // App's navigation or main component
     <NavigationContainer>
