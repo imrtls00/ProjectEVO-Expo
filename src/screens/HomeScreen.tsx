@@ -32,9 +32,8 @@ const HomeScreen: React.FC<Props> = () => {
   const [inputValue, setInputValue] = useState<string>('');
   const navigation = useNavigation();
 
-  const apiKey: string = GemAPI;
-  const genAI = new GoogleGenerativeAI(apiKey);
-
+  const genAI = new GoogleGenerativeAI(GemAPI);
+  
   const schema = {
     description: "List of actions to be performed",
     type: SchemaType.ARRAY,
