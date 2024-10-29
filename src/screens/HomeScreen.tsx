@@ -1,5 +1,7 @@
 // src/screens/HomeScreen.tsx
 
+import GemAPI from '../../secret';
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, FlatList, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,7 +32,7 @@ const HomeScreen: React.FC<Props> = () => {
   const [inputValue, setInputValue] = useState<string>('');
   const navigation = useNavigation();
 
-  const apiKey: string = process.env.API_KEY;
+  const apiKey: string = GemAPI;
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const schema = {
