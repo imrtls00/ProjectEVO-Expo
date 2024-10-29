@@ -1,5 +1,3 @@
-// src/screens/HomeScreen.tsx
-
 import React, { useState } from "react";
 import {
   View,
@@ -8,44 +6,24 @@ import {
   Pressable,
   StyleSheet,
   FlatList,
-  Button,
-  ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import { RootStackParamList } from "../types";
-import { StackNavigationProp } from "@react-navigation/stack";
-import GemAPI from "../../secret";
-
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from "expo-speech-recognition";
+import GemAPI from "../../secret";
 
-type ScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
-
-type Props = {
-  navigation: ScreenNavigationProp;
-};
-
-type Prompt = {
-  id: string;
-  text: string;
-};
-
-const prompts: Prompt[] = [
-  { id: "1", text: "Read a Summary of My Emails" },
-  { id: "2", text: "Schedule a Meeting With Boss" },
-  { id: "3", text: "Wake Me Up in 4 hours" },
-];
-
-const HomeScreen: React.FC<Props> = () => {
+const HomeScreen: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
-  const navigation = useNavigation<ScreenNavigationProp>();
+  const [recognizing, setRecognizing] = useState(false);
+  const navigation = useNavigation();
 
   const genAI = new GoogleGenerativeAI(GemAPI);
-
+  
   const schema = {
     description: "List of actions to be performed",
     type: SchemaType.ARRAY,
@@ -75,28 +53,28 @@ const HomeScreen: React.FC<Props> = () => {
     },
   };
 
-  // Function to handle voice-to-text conversion - alt approach
-  function Speech2Text() {
-    const [recognizing, setRecognizing] = useState(false);
-    const [transcript, setTranscript] = useState("");
+  // Handle Speech Recognition
+  useSpeechRecognitionEvent("start", () => setRecognizing(true));
+  useSpeechRecognitionEvent("end", () => setRecognizing(false));
+  useSpeechRecognitionEvent("result", (event) => {
+    const newTranscript = event.results[0]?.transcript || "";
+    setInputValue((prev) => prev + " " + newTranscript); // Append to existing input value
+  });
+  useSpeechRecognitionEvent("error", (event) => {
+    console.log("error code:", event.error, "error message:", event.message);
+  });
 
-    useSpeechRecognitionEvent("start", () => setRecognizing(true));
-    useSpeechRecognitionEvent("end", () => setRecognizing(false));
-    useSpeechRecognitionEvent("result", (event) => {
-      setTranscript(event.results[0]?.transcript);
-    });
-    useSpeechRecognitionEvent("error", (event) => {
-      console.log("error code:", event.error, "error messsage:", event.message);
-    });
-
-    const handleStart = async () => {
-      const result =
-        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+  const handleMicPress = async () => {
+    if (recognizing) {
+      // Stop recognition if it's ongoing
+      ExpoSpeechRecognitionModule.stop();
+    } else {
+      // Start speech recognition
+      const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!result.granted) {
         console.warn("Permissions not granted", result);
         return;
       }
-      // Start speech recognition
       ExpoSpeechRecognitionModule.start({
         lang: "en-US",
         interimResults: true,
@@ -106,22 +84,8 @@ const HomeScreen: React.FC<Props> = () => {
         addsPunctuation: false,
         contextualStrings: ["Carlsen", "Nepomniachtchi", "Praggnanandhaa"],
       });
-    };
-
-    return (
-      <View>
-        {!recognizing ? (
-          <Button title="Start" onPress={handleStart} />
-        ) : (
-          <Button title="Stop" onPress={ExpoSpeechRecognitionModule.stop} />
-        )}
-
-        <ScrollView>
-          <Text>{transcript}</Text>
-        </ScrollView>
-      </View>
-    );
-  }
+    }
+  };
 
   // Function to handle input submission and send to Gemini API
   const handlePrompt = async () => {
@@ -147,7 +111,7 @@ const HomeScreen: React.FC<Props> = () => {
   };
 
   // Render each prompt item
-  const renderPromptItem = ({ item }: { item: Prompt }) => (
+  const renderPromptItem = ({ item }: { item: { id: string; text: string } }) => (
     <Pressable style={styles.card} onPress={() => setInputValue(item.text)}>
       <Text style={styles.cardText}>{item.text}</Text>
     </Pressable>
@@ -159,14 +123,13 @@ const HomeScreen: React.FC<Props> = () => {
         Hi! 👋🏼 {"\n"}What can EVO {"\n"} do for you?
       </Text>
 
-      <Text style={styles.subHeading}>
-        Quick Prompts{" "}
-        <Text style={styles.divider}>--------------------------------</Text>
-      </Text>
-
       <FlatList
         horizontal
-        data={prompts}
+        data={[
+          { id: "1", text: "Read a Summary of My Emails" },
+          { id: "2", text: "Schedule a Meeting With Boss" },
+          { id: "3", text: "Wake Me Up in 4 hours" },
+        ]}
         keyExtractor={(item) => item.id}
         renderItem={renderPromptItem}
         contentContainerStyle={styles.cardContainer}
@@ -181,12 +144,11 @@ const HomeScreen: React.FC<Props> = () => {
           onChangeText={setInputValue}
         />
         <Pressable style={styles.submitButton} onPress={handlePrompt}>
-          <MaterialIcons
-            name={inputValue ? "send" : "mic"} // Show microphone when input is empty
-            size={24}
-            color="#FFF"
-            onPress={inputValue ? handlePrompt : Speech2Text} // Trigger voice2Text if input is empty
-          />
+          {recognizing ? (
+            <ActivityIndicator color="#FFF" size="small" />
+          ) : (
+            <MaterialIcons name="mic" size={24} color="#FFF" onPress={handleMicPress} />
+          )}
         </Pressable>
       </View>
     </View>
@@ -206,16 +168,6 @@ const styles = StyleSheet.create({
     lineHeight: 60,
     marginTop: 60,
     marginBottom: 20,
-  },
-  subHeading: {
-    color: "#B2B4B9",
-    fontSize: 24,
-    fontWeight: "medium",
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  divider: {
-    color: "#0061FF",
   },
   cardContainer: {
     marginBottom: 20,
