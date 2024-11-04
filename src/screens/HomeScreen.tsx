@@ -58,7 +58,7 @@ const HomeScreen: React.FC = () => {
   useSpeechRecognitionEvent("end", () => setRecognizing(false));
   useSpeechRecognitionEvent("result", (event) => {
     const newTranscript = event.results[0]?.transcript || "";
-    setInputValue((prev) => prev + " " + newTranscript); // Append to existing input value
+    setInputValue((prev) => newTranscript); // Append to existing input value
   });
   useSpeechRecognitionEvent("error", (event) => {
     console.log("error code:", event.error, "error message:", event.message);
@@ -102,8 +102,9 @@ const HomeScreen: React.FC = () => {
           responseSchema: schema,
         },
       });
-
+      console.log("Generating content for:", inputValue);
       const result = await model.generateContent(inputValue);
+
       navigation.navigate("Results", { result: result.response.text() });
     } catch (error) {
       console.error("Error generating content:", error);
@@ -129,6 +130,8 @@ const HomeScreen: React.FC = () => {
           { id: "1", text: "Read a Summary of My Emails" },
           { id: "2", text: "Schedule a Meeting With Boss" },
           { id: "3", text: "Wake Me Up in 4 hours" },
+          { id: "4", text: "Text Asad on WhatsApp" },
+          { id: "5", text: "Call My Friend" },
         ]}
         keyExtractor={(item) => item.id}
         renderItem={renderPromptItem}
@@ -143,12 +146,16 @@ const HomeScreen: React.FC = () => {
           value={inputValue}
           onChangeText={setInputValue}
         />
-        <Pressable style={styles.submitButton} onPress={handlePrompt}>
-          {recognizing ? (
-            <ActivityIndicator color="#FFF" size="small" />
-          ) : (
-            <MaterialIcons name="mic" size={24} color="#FFF" onPress={handleMicPress} />
-          )}
+        <Pressable style={styles.submitButton}>
+            { inputValue ? (
+            <MaterialIcons name="send" size={24} color="#FFF" onPress={handlePrompt} />
+            ) : (
+            recognizing ? (
+              <ActivityIndicator color="#FFF" size="small" />
+            ) : (
+              <MaterialIcons name="mic" size={24} color="#FFF" onPress={handleMicPress} />
+            )
+            )}
         </Pressable>
       </View>
     </View>

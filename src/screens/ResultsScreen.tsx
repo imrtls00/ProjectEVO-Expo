@@ -30,19 +30,13 @@ const openGmailApp = async () => {
 
 const makePhoneCall = async (phoneNumber: string) => {
   const phoneUrl = `tel:${phoneNumber}`;
-  
-  const canOpen = await Linking.canOpenURL(phoneUrl);
-  if (canOpen) {
-    // Open the phone dialer with the phone number
-    console.log("Phone URL: ", phoneUrl);
-  } else {
-    Alert.alert('Error', 'Unable to open the phone dialer');
-  }
+  await Linking.openURL(phoneUrl);
 };
 
 const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
   const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
   
+  await Linking.openURL(whatsappUrl);
   // Check if WhatsApp is installed
   const canOpen = await Linking.canOpenURL(whatsappUrl);
   if (canOpen) {
@@ -55,7 +49,8 @@ const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
 
 const setAlarm = async (hour: number, minute: number, message: string) => {
   if (Platform.OS === 'android') {
-    const alarmIntent = `intent://alarm?hour=${hour}&minutes=${minute}&message=${encodeURIComponent(message)}#Intent;scheme=android-app;package=com.google.android.deskclock;end`;
+    const alarmIntent = `intent://alarm`;
+    await Linking.openURL(alarmIntent);
     const canOpen = await Linking.canOpenURL(alarmIntent);
     if (canOpen) {
       await Linking.openURL(alarmIntent);
@@ -69,34 +64,36 @@ const setAlarm = async (hour: number, minute: number, message: string) => {
 
 const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { result } = route.params;
-  var resultString = JSON.stringify(result);
 
+  var resultString = JSON.parse(result);
+
+  console.log("Action Suggested by Model: ", resultString);
   console.log("Result From Model: ", result);
 
-  if (result.includes("NotAvailable")) {
-    resultString = "Sorry, this feature is under-development and is currently unavailable in beta-mode.";
-  } else if (result.includes("SendEmail")) {
-    console.log("Send Email feature implementation");
-    openGmailApp();
+  // if (result.includes("NotAvailable")) {
+  //   resultString = "Sorry, this feature is under-development and is currently unavailable in beta-mode.";
+  // } else if (result.includes("SendEmail")) {
+  //   console.log("Send Email feature implementation");
+  //   openGmailApp();
 
-  } else if (result.includes("SummaryOfEmails")) {
-    console.log("Summary of Emails feature implementation");
-  } else if (result.includes("ScheduleMeeting")) {
-    console.log("Schedule Meeting feature implementation");
-  } else if (result.includes("SetAlarm")) {
-    console.log("Set Alarm feature implementation");
-    setAlarm(10, 30, "Wake up for work");
+  // } else if (result.includes("SummaryOfEmails")) {
+  //   console.log("Summary of Emails feature implementation");
+  // } else if (result.includes("ScheduleMeeting")) {
+  //   console.log("Schedule Meeting feature implementation");
+  // } else if (result.includes("SetAlarm")) {
+  //   console.log("Set Alarm feature implementation");
+  //   setAlarm(10, 30, "Wake up for work");
 
-  } else if (result.includes("TextWhatsApp")) {
-    console.log("Text WhatsApp feature implementation");
-    sendWhatsAppMessage("+1234567890", "Hello, this is a test message");
+  // } else if (result.includes("TextWhatsApp")) {
+  //   console.log("Text WhatsApp feature implementation");
+  //   sendWhatsAppMessage("+1234567890", "Hello, this is a test message");
     
-  } else if (result.includes("Call")) {
-    console.log("Call feature implementation");
-    makePhoneCall("+1234567890");
-  } else {
-    console.log("Error occured at Root Level, Error: Model returned an unknown action");
-  }
+  // } else if (result.includes("Call")) {
+  //   console.log("Call feature implementation");
+  //   makePhoneCall("+1234567890");
+  // } else {
+  //   console.log("Error occured at Root Level, Error: Model returned an unknown action");
+  // }
 
   return (
     <View style={styles.container}>
@@ -104,6 +101,7 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
       <ScrollView style={styles.resultContainer}>
         <Text style={styles.resultText}>{resultString}</Text>
       </ScrollView>
+      <Button title="My Action" onPress={() => sendWhatsAppMessage("923076718155", "This is my message")} />
       <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>
   );
