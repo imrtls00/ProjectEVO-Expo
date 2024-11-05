@@ -30,7 +30,7 @@ const HomeScreen: React.FC = () => {
     items: {
       type: SchemaType.OBJECT,
       properties: {
-        actionName: {
+        action: {
           type: SchemaType.STRING,
           description: "any of the following",
           enum: [
@@ -40,16 +40,25 @@ const HomeScreen: React.FC = () => {
             "SetAlarm",
             "TextWhatsApp",
             "Call",
+            "Instagram",
             "NotAvailable",
           ],
           nullable: false,
         },
-        message: {
+        messageToShow: {
           type: SchemaType.STRING,
-          description: "Text Response",
+          description: "Response to show to the user on screen",
+        },
+        body: {
+          type: SchemaType.STRING,
+          description: "Message to be used for the action, such as email or message body, etc.",
+        },
+        subject: {
+          type: SchemaType.STRING,
+          description: "Subject or Title of the email, message, alarm, meeting, etc.",
         },
       },
-      required: ["actionName"],
+      required: ["action"],
     },
   };
 

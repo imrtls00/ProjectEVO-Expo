@@ -51,7 +51,8 @@
             "com.google.android.googlequicksearchbox"
           ]
         }
-      ]
+      ],
+      "expo-router"
     ],
     "extra": {
       "eas": {
