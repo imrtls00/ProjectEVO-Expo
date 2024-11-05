@@ -81,6 +81,12 @@ const gotoCalendar = async (subject: string, body: string) => {
   router.push("./MyCalendar");
 };
 
+const openWeatherPage = (city : string) => {
+  const weatherUrl = `https://www.google.com/search?q=weather+in+${encodeURIComponent(city)}`;
+  Linking.openURL(weatherUrl)
+    .catch(err => console.error("Failed to open URL:", err));
+};
+
 const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { result } = route.params;
   var resultObj = JSON.parse(result);
@@ -120,6 +126,9 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   } else if (action.includes("Instagram")) {
     console.log("Instagram Feature Implementation");
     Linking.openURL("https://instagram.com");
+  } else if (action.includes("Weather")) {
+    console.log("Weather Feature Implementation");
+    openWeatherPage("");
   } else {
     console.log(
       "Error occured at Root Level, Error: Model returned an unknown action"

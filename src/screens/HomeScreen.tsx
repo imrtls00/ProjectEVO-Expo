@@ -14,6 +14,7 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
+  getSupportedLocales,
 } from "expo-speech-recognition";
 import GemAPI from "../../secret";
 
@@ -41,6 +42,7 @@ const HomeScreen: React.FC = () => {
             "TextWhatsApp",
             "Call",
             "Instagram",
+            "Weather",
             "NotAvailable",
           ],
           nullable: false,
@@ -73,7 +75,34 @@ const HomeScreen: React.FC = () => {
     console.log("error code:", event.error, "error message:", event.message);
   });
 
+
+  getSupportedLocales({
+    /**
+     * The package name of the speech recognition service to use.
+     * If not provided, the default service used for on-device recognition will be used.
+     *
+     * Warning: the service package (such as Bixby) may not be able to return any results.
+     */
+    androidRecognitionServicePackage: "com.google.android.as",
+  })
+    .then((supportedLocales) => {
+      console.log("Supported locales:", supportedLocales.locales.join(", "));
+  
+      // The on-device locales for the provided service package.
+      // Likely will be empty if it's not "com.google.android.as"
+      console.log(
+        "On-device locales:",
+        supportedLocales.installedLocales.join(", "),
+      );
+    })
+    .catch((error) => {
+      // If the service package is not found
+      // or there was an error retrieving the supported locales
+      console.error("Error getting supported locales:", error);
+    });
+
   const handleMicPress = async () => {
+    getSupportedLocales();
     if (recognizing) {
       // Stop recognition if it's ongoing
       ExpoSpeechRecognitionModule.stop();
