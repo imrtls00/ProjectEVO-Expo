@@ -10,11 +10,14 @@ import {
   ScrollView,
   Button,
   Platform,
+  Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { router } from "expo-router";
+
+import { theme } from "../constants/theme";
 
 type ScreenNavigationProp = StackNavigationProp<RootStackParamList, "Results">;
 type ScreenRouteProp = RouteProp<RootStackParamList, "Results">;
@@ -81,28 +84,32 @@ const gotoCalendar = async (subject: string, body: string) => {
   router.push("./MyCalendar");
 };
 
-const openWeatherPage = (city : string) => {
-  const weatherUrl = `https://www.google.com/search?q=weather+in+${encodeURIComponent(city)}`;
-  Linking.openURL(weatherUrl)
-    .catch(err => console.error("Failed to open URL:", err));
+const openWeatherPage = (city: string) => {
+  const weatherUrl = `https://www.google.com/search?q=weather+in+${encodeURIComponent(
+    city
+  )}`;
+  Linking.openURL(weatherUrl).catch((err) =>
+    console.error("Failed to open URL:", err)
+  );
 };
 
 const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { result } = route.params;
   var resultObj = JSON.parse(result);
-  const action = resultObj[0].action;
-  const message = resultObj[0].messageToShow;
-  const body = resultObj[0].body;
-  const subject = resultObj[0].subject;
-  const email = "sp21-bse-071@cuilahore.edu.pk";
-  const phone = "03076718155";
+
+  var action = resultObj[0].action;
+  var message = resultObj[0].messageToShow;
+  var body = resultObj[0].body;
+  var subject = resultObj[0].subject;
+  var email = "sp21-bse-071@cuilahore.edu.pk";
+  var phone = "03076718155";
 
   console.log("Action Suggested by Model: ", action);
   console.log("Message: ", message);
   console.log("Body: ", body);
 
   if (action.includes("NotAvailable")) {
-    resultString =
+    message =
       "Sorry, this feature is under-development and is currently unavailable in beta-mode.";
   } else if (action.includes("SendEmail")) {
     console.log("Send Email feature implementation");
@@ -143,50 +150,51 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
       </ScrollView>
       <Text style={styles.title}>Test Actions</Text>
       <View>
-        <Button
-          title="WA Test"
+        <Pressable
+          style={styles.button}
           onPress={() =>
             sendWhatsAppMessage("923076718155", subject + ":\n\n" + body)
           }
-        />
-        <Button
-          title="Alarm"
-          onPress={() =>
-            setAlarm(10, 30, subject)
-          }
-        />
-        <Button
-          title="Call"
-          onPress={() =>
-            makePhoneCall(phone)
-          }
-        />
-        <Button
-          title="Email"
-          onPress={() =>
-            openGmailApp(email, subject, body)
-          }
-        />
-        <Button
-          title="Summary"
-          onPress={() =>
-            Linking.openURL("https://gmail.app.goo.gl")
-          }
-        />
-        <Button
-          title="Calendar"
-          onPress={() =>
-            gotoCalendar(subject, body)
-          }
-        />
-        <Button
-          title="Instagram"
-          onPress={() =>
-            Linking.openURL("https://instagram.com")
-          }
-        />
+        >
+          <Text style={styles.buttonText}>WA Test</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => setAlarm(10, 30, subject)}
+        >
+          <Text style={styles.buttonText}>Alarm</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => makePhoneCall(phone)}>
+          <Text style={styles.buttonText}>Call</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => openGmailApp(email, subject, body)}
+        >
+          <Text style={styles.buttonText}>Email</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => Linking.openURL("https://gmail.app.goo.gl")}
+        >
+          <Text style={styles.buttonText}>Summary</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => gotoCalendar(subject, body)}
+        >
+          <Text style={styles.buttonText}>Calendar</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button}
+          onPress={() => Linking.openURL("https://instagram.com")}
+        >
+          <Text style={styles.buttonText}>Instagram</Text>
+        </Pressable>
       </View>
-      <Button title="Go Back" onPress={() => navigation.goBack()} />
+      <Pressable style={styles.buttonSecondary} onPress={() => navigation.goBack()}>
+        <Text style={styles.buttonText}>Go Back</Text>
+      </Pressable>
     </View>
   );
 };
@@ -194,11 +202,11 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#010616",
+    backgroundColor: theme.colors.backgroundColor,
     padding: 20,
   },
   title: {
-    color: "#C6C9CF",
+    color: theme.colors.textHighlightColor,
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
@@ -208,9 +216,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resultText: {
-    color: "#B2B4B9",
+    color: theme.colors.textColor,
     fontSize: 18,
     lineHeight: 24,
+  },
+  button: {
+    backgroundColor: theme.colors.backgroundHighlightColor,
+    padding: 16,
+    borderRadius: 100,
+    marginVertical: 8,
+  },
+  buttonSecondary: {
+    backgroundColor: theme.colors.backgroundColor,
+    padding: 16,
+    borderRadius: 100,
+    marginVertical: 8,
+    borderWidth: 4,
+    borderColor: theme.colors.backgroundHighlightColor,
+  },
+  buttonText: {
+    color: theme.colors.textHighlightColor,
+    fontSize: 18,
+    textAlign: "center",
   },
 });
 

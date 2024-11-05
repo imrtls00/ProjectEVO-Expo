@@ -1,3 +1,5 @@
+// src/screens/HomeScreen.tsx
+
 import React, { useState } from "react";
 import {
   View,
@@ -14,17 +16,17 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
-  getSupportedLocales,
 } from "expo-speech-recognition";
-import GemAPI from "../../secret";
 
 const HomeScreen: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [recognizing, setRecognizing] = useState(false);
   const navigation = useNavigation();
 
-  const genAI = new GoogleGenerativeAI(GemAPI);
-  
+  const genAI = new GoogleGenerativeAI(
+    process.env.EXPO_PUBLIC_API_KEY || "no-api-key"
+  );
+
   const schema = {
     description: "List of actions to be performed",
     type: SchemaType.ARRAY,
@@ -53,11 +55,13 @@ const HomeScreen: React.FC = () => {
         },
         body: {
           type: SchemaType.STRING,
-          description: "Message to be used for the action, such as email or message body, etc.",
+          description:
+            "Message to be used for the action, such as email or message body, etc.",
         },
         subject: {
           type: SchemaType.STRING,
-          description: "Subject or Title of the email, message, alarm, meeting, etc.",
+          description:
+            "Subject or Title of the email, message, alarm, meeting, etc.",
         },
       },
       required: ["action", "messageToShow"],
@@ -69,46 +73,21 @@ const HomeScreen: React.FC = () => {
   useSpeechRecognitionEvent("end", () => setRecognizing(false));
   useSpeechRecognitionEvent("result", (event) => {
     const newTranscript = event.results[0]?.transcript || "";
+
     setInputValue((prev) => newTranscript); // Append to existing input value
   });
   useSpeechRecognitionEvent("error", (event) => {
     console.log("error code:", event.error, "error message:", event.message);
   });
 
-
-  getSupportedLocales({
-    /**
-     * The package name of the speech recognition service to use.
-     * If not provided, the default service used for on-device recognition will be used.
-     *
-     * Warning: the service package (such as Bixby) may not be able to return any results.
-     */
-    androidRecognitionServicePackage: "com.google.android.as",
-  })
-    .then((supportedLocales) => {
-      console.log("Supported locales:", supportedLocales.locales.join(", "));
-  
-      // The on-device locales for the provided service package.
-      // Likely will be empty if it's not "com.google.android.as"
-      console.log(
-        "On-device locales:",
-        supportedLocales.installedLocales.join(", "),
-      );
-    })
-    .catch((error) => {
-      // If the service package is not found
-      // or there was an error retrieving the supported locales
-      console.error("Error getting supported locales:", error);
-    });
-
   const handleMicPress = async () => {
-    getSupportedLocales();
     if (recognizing) {
       // Stop recognition if it's ongoing
       ExpoSpeechRecognitionModule.stop();
     } else {
       // Start speech recognition
-      const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      const result =
+        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
       if (!result.granted) {
         console.warn("Permissions not granted", result);
         return;
@@ -150,7 +129,11 @@ const HomeScreen: React.FC = () => {
   };
 
   // Render each prompt item
-  const renderPromptItem = ({ item }: { item: { id: string; text: string } }) => (
+  const renderPromptItem = ({
+    item,
+  }: {
+    item: { id: string; text: string };
+  }) => (
     <Pressable style={styles.card} onPress={() => setInputValue(item.text)}>
       <Text style={styles.cardText}>{item.text}</Text>
     </Pressable>
@@ -185,15 +168,23 @@ const HomeScreen: React.FC = () => {
           onChangeText={setInputValue}
         />
         <Pressable style={styles.submitButton}>
-            { inputValue ? (
-            <MaterialIcons name="send" size={24} color="#FFF" onPress={handlePrompt} />
-            ) : (
-            recognizing ? (
-              <ActivityIndicator color="#FFF" size="small" />
-            ) : (
-              <MaterialIcons name="mic" size={24} color="#FFF" onPress={handleMicPress} />
-            )
-            )}
+          {inputValue ? (
+            <MaterialIcons
+              name="send"
+              size={24}
+              color="#FFF"
+              onPress={handlePrompt}
+            />
+          ) : recognizing ? (
+            <ActivityIndicator color="#FFF" size="small" />
+          ) : (
+            <MaterialIcons
+              name="mic"
+              size={24}
+              color="#FFF"
+              onPress={handleMicPress}
+            />
+          )}
         </Pressable>
       </View>
     </View>

@@ -16,7 +16,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 
-import { Button } from '../components/Button';
+import { Button } from '../components/OnboardingButton';
 import { Pagination } from '../components/Pagination';
 import { theme } from '../constants/theme';
 import { data, type Data } from '../data/screens';

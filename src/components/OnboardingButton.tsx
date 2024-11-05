@@ -35,6 +35,7 @@ export function Button({
     return {
       width: isLastScreen ? withSpring(140) : withSpring(60),
       height: 60,
+      display: 'flex',
     };
   });
 
@@ -43,7 +44,7 @@ export function Button({
     return {
       opacity: isLastScreen ? withTiming(0) : withTiming(1),
       transform: [
-        { translateX: isLastScreen ? withTiming(100) : withTiming(0) },
+        { translateX: isLastScreen ? withTiming(0) : withTiming(0) },
       ],
     };
   });

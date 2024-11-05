@@ -38,7 +38,7 @@ const App: React.FC = () => {
         <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
-        <Stack.Screen name="Results" component={ResultsScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Results" component={ResultsScreen}  initialParams={{ result: '' }} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
