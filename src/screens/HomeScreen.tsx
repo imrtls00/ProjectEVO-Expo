@@ -58,7 +58,7 @@ const HomeScreen: React.FC = () => {
           description: "Subject or Title of the email, message, alarm, meeting, etc.",
         },
       },
-      required: ["action"],
+      required: ["action", "messageToShow"],
     },
   };
 

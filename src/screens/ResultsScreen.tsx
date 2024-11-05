@@ -85,7 +85,7 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { result } = route.params;
   var resultObj = JSON.parse(result);
   const action = resultObj[0].action;
-  const message = resultObj[0].message;
+  const message = resultObj[0].messageToShow;
   const body = resultObj[0].body;
   const subject = resultObj[0].subject;
   const email = "sp21-bse-071@cuilahore.edu.pk";
