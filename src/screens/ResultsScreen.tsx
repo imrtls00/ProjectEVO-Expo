@@ -13,6 +13,7 @@ import {
   Pressable,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useNavigation } from "@react-navigation/native";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { router } from "expo-router";
@@ -32,15 +33,6 @@ const openGmailApp = async (email: string, subject: string, body: string) => {
     subject
   )}&body=${encodeURIComponent(body)}`;
   await Linking.openURL(gmailUrl);
-
-  // Check if Gmail is available
-  // await Linking.canOpenURL(gmailUrl);
-  // if (canOpen) {
-  //   // Open Gmail app
-  //   await Linking.openURL(gmailUrl);
-  // } else {
-  //   Alert.alert('Error', 'Gmail app is not available on this device');
-  // }
 };
 
 const makePhoneCall = async (phoneNumber: string) => {
@@ -81,7 +73,6 @@ const setAlarm = async (hour: number, minute: number, message: string) => {
 
 const gotoCalendar = async (subject: string, body: string) => {
   // navigate to MyCalendar.tsx
-  router.push("./MyCalendar");
 };
 
 const openWeatherPage = (city: string) => {
@@ -94,6 +85,7 @@ const openWeatherPage = (city: string) => {
 };
 
 const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
+
   const { result } = route.params;
   var resultObj = JSON.parse(result);
 
@@ -181,7 +173,7 @@ const ResultsScreen: React.FC<Props> = ({ route, navigation }) => {
         </Pressable>
         <Pressable
           style={styles.button}
-          onPress={() => gotoCalendar(subject, body)}
+          onPress={() =>   navigation.navigate("MyCalendar")}
         >
           <Text style={styles.buttonText}>Calendar</Text>
         </Pressable>

@@ -14,6 +14,7 @@ import {Onboarding} from './src/screens/Onboarding';
 import HomeScreen from './src/screens/HomeScreen';
 import ResultsScreen from './src/screens/ResultsScreen';
 import { RootStackParamList } from './src/types';
+import MyCalendar from './src/screens/MyCalendar';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -39,6 +40,7 @@ const App: React.FC = () => {
         <Stack.Screen name="Onboarding" component={Onboarding} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Results" component={ResultsScreen}  initialParams={{ result: '' }} options={{ headerShown: false }}/>
+        <Stack.Screen name="MyCalendar" component={MyCalendar} options={{ headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -5,6 +5,7 @@ export type RootStackParamList = {
     Onboarding: undefined;
     Home: undefined;
     Results: { result: string };
+    MyCalendar: undefined;
   };
   
   export type UIHierarchy = {
