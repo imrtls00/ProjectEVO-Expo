@@ -42,7 +42,7 @@ export function Button({
   const arrowAnimationStyle = useAnimatedStyle(() => {
     const isLastScreen = flatListIndex.value === dataLength - 1;
     return {
-      opacity: isLastScreen ? withTiming(0) : withTiming(1),
+      opacity: isLastScreen ? withTiming(1) : withTiming(1),
       transform: [
         { translateX: isLastScreen ? withTiming(0) : withTiming(0) },
       ],
@@ -96,14 +96,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    flexDirection: 'row',
+    
+    borderColor: 'red',
+    borderWidth: 1,
   },
   arrow: {
-    position: 'absolute',
+    position: 'relative',
+    borderColor: 'red',
+    borderWidth: 1,
   },
   text: {
-    position: 'absolute',
+    position: 'relative',
     fontSize: 16,
     fontWeight: 'bold',
+    paddingHorizontal: 10,
     color: theme.colors.textHighlightColor,
   },
 });
