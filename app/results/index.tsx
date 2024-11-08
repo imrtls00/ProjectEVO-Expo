@@ -12,7 +12,7 @@ import {
   Pressable,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { theme } from "@/src/constants/theme";
+import { globalStyles, colors, spacing } from '@/src/Styles/globalStyles';
 
 export default function ResultsScreen() {
   const router = useRouter();
@@ -113,70 +113,28 @@ export default function ResultsScreen() {
       openWeatherPage("");
     } else {
       console.log(
-        "Error occured at Root Level, Error: Model returned an unknown action"
+        "Error occurred at Root Level, Error: Model returned an unknown action"
       );
     }
 
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Generated Result</Text>
-      <ScrollView style={styles.resultContainer}>
-        <Text style={styles.resultText}>{displayMessage}</Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Generated Result</Text>
+      <ScrollView style={globalStyles.resultContainer}>
+        <Text style={globalStyles.resultText}>{displayMessage}</Text>
       </ScrollView>
-      <Text style={styles.title}>Test Actions</Text>
+      <Text style={globalStyles.title}>Test Actions</Text>
       <Pressable
-        style={styles.button}
+        style={globalStyles.button}
         onPress={() => actionPerformer(action)}
       >
-        <Text style={styles.buttonText}>Perform Action</Text>
+        <Text style={globalStyles.buttonText}>Perform Action</Text>
       </Pressable>
-      <Pressable style={styles.buttonSecondary} onPress={() => router.back()}>
-        <Text style={styles.buttonText}>Go Back</Text>
+      <Pressable style={globalStyles.buttonSecondary} onPress={() => router.back()}>
+        <Text style={globalStyles.buttonText}>Go Back</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.backgroundColor,
-    padding: 20,
-  },
-  title: {
-    color: theme.colors.textHighlightColor,
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  resultContainer: {
-    flex: 1,
-    marginBottom: 20,
-  },
-  resultText: {
-    color: theme.colors.textColor,
-    fontSize: 18,
-    lineHeight: 24,
-  },
-  button: {
-    backgroundColor: theme.colors.backgroundHighlightColor,
-    padding: 16,
-    borderRadius: 100,
-    marginVertical: 8,
-  },
-  buttonSecondary: {
-    backgroundColor: theme.colors.backgroundColor,
-    padding: 16,
-    borderRadius: 100,
-    marginVertical: 8,
-    borderWidth: 4,
-    borderColor: theme.colors.backgroundHighlightColor,
-  },
-  buttonText: {
-    color: theme.colors.textHighlightColor,
-    fontSize: 18,
-    textAlign: "center",
-  },
-});

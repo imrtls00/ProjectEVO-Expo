@@ -1,26 +1,11 @@
 import React from "react";
-import { Pressable, Text, StyleSheet } from "react-native";
+import { Pressable, Text } from "react-native";
+import { globalStyles } from '@/src/Styles/globalStyles';
 
 const PromptCard = ({ text, onPress }: { text: string; onPress: () => void }) => (
-  <Pressable style={styles.card} onPress={onPress}>
-    <Text style={styles.cardText}>{text}</Text>
+  <Pressable style={globalStyles.card} onPress={onPress}>
+    <Text style={globalStyles.title}>{text}</Text>
   </Pressable>
 );
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#010F2D",
-    padding: 32,
-    borderRadius: 32,
-    marginRight: 12,
-    height: 138,
-    width: 200,
-  },
-  cardText: {
-    color: "#999FAB",
-    fontSize: 20,
-    fontWeight: "medium",
-  },
-});
 
 export default PromptCard;
