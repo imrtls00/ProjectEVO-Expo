@@ -115,3 +115,9 @@ This project is part of academic work at COMSATS University Islamabad, Lahore Ca
 ---
 
 Developed with ❤️ by Sameer Faisal, at COMSATS University Islamabad, Lahore Campus
+
+
+## 🙏 Acknowledgments
+
+- [React Native Onboarding Screens](https://github.com/areasflavio/react-native-onboarding-screens) - Inspiration and base implementation for our onboarding flow
+

@@ -13,7 +13,6 @@ import Animated, {
 import { theme } from '../constants/theme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-const AnimatedFeather = Animated.createAnimatedComponent(Feather);
 
 type ButtonProps = {
   flatListRef: RefObject<FlatList>;
@@ -39,16 +38,6 @@ export function Button({
     };
   });
 
-  const arrowAnimationStyle = useAnimatedStyle(() => {
-    const isLastScreen = flatListIndex.value === dataLength - 1;
-    return {
-      opacity: isLastScreen ? withTiming(1) : withTiming(1),
-      transform: [
-        { translateX: isLastScreen ? withTiming(0) : withTiming(0) },
-      ],
-    };
-  });
-
   const textAnimationStyle = useAnimatedStyle(() => {
     const isLastScreen = flatListIndex.value === dataLength - 1;
     return {
@@ -56,6 +45,15 @@ export function Button({
       transform: [
         { translateX: isLastScreen ? withTiming(0) : withTiming(-100) },
       ],
+    };
+  });
+
+  const showArrow = useAnimatedStyle(() => {
+    const isLastScreen = flatListIndex.value === dataLength - 1;
+    return {
+      opacity: isLastScreen ? withTiming(0) : withTiming(1),
+      position: 'absolute',
+      right: 15,
     };
   });
 
@@ -78,12 +76,13 @@ export function Button({
         Get Started
       </Animated.Text>
 
-      <AnimatedFeather
-        name="arrow-right"
-        size={30}
-        color={theme.colors.textHighlightColor}
-        style={[styles.arrow, arrowAnimationStyle]}
-      />
+      <Animated.View style={showArrow}>
+        <Feather
+          name="arrow-right"
+          size={30}
+          color={theme.colors.textHighlightColor}
+        />
+      </Animated.View>
     </AnimatedPressable>
   );
 }
@@ -97,14 +96,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     flexDirection: 'row',
-    
-    borderColor: 'red',
-    borderWidth: 1,
-  },
-  arrow: {
-    position: 'relative',
-    borderColor: 'red',
-    borderWidth: 1,
   },
   text: {
     position: 'relative',
