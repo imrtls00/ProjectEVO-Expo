@@ -12,12 +12,20 @@ import { model } from "@/src/services/generativeAI";
 import { theme } from "@/src/constants/theme";
 import { promptData } from "@/src/constants/data";
 import { globalStyles } from "@/src/Styles/globalStyles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen() {
   const [inputValue, setInputValue] = useState("");
   const [recognizing, setRecognizing] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setResults } = useResults();
+  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
+
+  interface GoogleUser {
+    name: string;
+    email: string;
+    // Add other properties if needed
+  }
 
   // Clear input when screen comes into focus
   useFocusEffect(
@@ -48,10 +56,23 @@ export default function HomeScreen() {
     }
   };
 
+  const getGoogleUser = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem("googleUser");
+      if (storedUser) {
+        setGoogleUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error("Error retrieving Google user data:", error);
+    }
+  };
+
+  getGoogleUser();
+
   return (
     <View style={globalStyles.inputContainer}>
       <Text style={globalStyles.title}>
-        Hi! 👋🏼 {"\n"}What can EVO {"\n"}do for you?
+        Hi { googleUser?.name }! 👋🏼 {"\n"}What can EVO {"\n"}do for you?
       </Text>
       <FlatList
         horizontal

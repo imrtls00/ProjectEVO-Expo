@@ -16,10 +16,11 @@ export default function SettingsScreen() {
     useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: "YOUR_EXPO_CLIENT_ID",
-    iosClientId: "YOUR_IOS_CLIENT_ID",
-    androidClientId: "YOUR_ANDROID_CLIENT_ID",
-    webClientId: "YOUR_WEB_CLIENT_ID",
+    // clientId: "YOUR_EXPO_CLIENT_ID",
+    // iosClientId: "YOUR_IOS_CLIENT_ID",
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_GOOGLE_OAUTH,
+    // webClientId: "YOUR_WEB_CLIENT_ID",
+    scopes: ["profile", "email"],
   });
 
   // Define the interface for Google user data
