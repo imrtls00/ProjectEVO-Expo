@@ -1,5 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
-
+import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import React, { RefObject } from 'react';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
@@ -20,14 +19,14 @@ type ButtonProps = {
   dataLength: number;
 };
 
-export function Button({
+export default function Button({
   dataLength,
   flatListIndex,
   flatListRef,
 }: ButtonProps) {
 
   // Inside the Button component
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const buttonAnimationStyle = useAnimatedStyle(() => {
     const isLastScreen = flatListIndex.value === dataLength - 1;
@@ -63,7 +62,7 @@ export function Button({
       flatListRef.current?.scrollToIndex({ index: flatListIndex.value + 1 });
     } else {
       // Navigate to the next screen
-      navigation.navigate('Home');
+      router.navigate("(tabs)");
     }
   };
 

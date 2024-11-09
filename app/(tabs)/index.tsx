@@ -1,19 +1,32 @@
 import React, { useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { Text, View, FlatList } from "react-native";
+import { router } from "expo-router";
+import { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useResults } from '@/src/context/ResultsContext';
 
 // Import from src folder using alias
-import { PromptCard, InputSection, HeaderTitle } from "@/src/components";
+import { PromptCard, InputSection } from "@/src/components";
 import { useSpeechRecognition } from "@/src/hooks/useSpeechRecognition";
 import { model } from "@/src/services/generativeAI";
 import { theme } from "@/src/constants/theme";
 import { promptData } from "@/src/constants/data";
+import { globalStyles } from "@/src/Styles/globalStyles";
 
 export default function HomeScreen() {
   const [inputValue, setInputValue] = useState("");
   const [recognizing, setRecognizing] = useState(false);
-  const router = useRouter();
-  
+  const [loading, setLoading] = useState(false);
+  const { setResults } = useResults();
+
+  // Clear input when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      setInputValue("");
+      setLoading(false);
+    }, [])
+  );
+
   const handleMicPress = useSpeechRecognition(
     setInputValue,
     recognizing,
@@ -22,16 +35,24 @@ export default function HomeScreen() {
 
   const handlePrompt = async () => {
     if (!inputValue) return;
-    const result = await model.generateContent(inputValue);
-    router.push({
-      pathname: "/results",
-      params: { result: result.response.text() }
-    });
+    setLoading(true);
+    try {
+      const result = await model.generateContent(inputValue);
+      const response = await result.response.text();
+      setResults(response);
+      router.navigate("/(tabs)/results");
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <HeaderTitle />
+    <View style={globalStyles.inputContainer}>
+      <Text style={globalStyles.title}>
+        Hi! 👋🏼 {"\n"}What can EVO {"\n"}do for you?
+      </Text>
       <FlatList
         horizontal
         data={promptData}
@@ -42,7 +63,7 @@ export default function HomeScreen() {
             onPress={() => setInputValue(item.text)}
           />
         )}
-        contentContainerStyle={styles.cardContainer}
+        contentContainerStyle={globalStyles.cardListContainer}
       />
       <InputSection
         inputValue={inputValue}
@@ -50,18 +71,8 @@ export default function HomeScreen() {
         onMicPress={handleMicPress}
         onSend={handlePrompt}
         recognizing={recognizing}
+        loading={loading}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: theme.colors.backgroundColor, 
-    padding: 20 
-  },
-  cardContainer: { 
-    marginBottom: 20 
-  },
-});

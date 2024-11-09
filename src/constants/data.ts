@@ -26,3 +26,10 @@ export const onboardingData = [
     text: 'EVO helps you stay on top of your tasks and goals.',
   }
 ];
+
+export type Data = {
+  id: number;
+  image: any; // Adjust type as necessary
+  title: string;
+  text: string;
+};

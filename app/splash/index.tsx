@@ -30,6 +30,8 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  console.log("I was run inside Splash Screen");
+
   return (
     <View style={styles.container}>
       <AnimatedSvg width={LOGO_WIDTH} height={LOGO_WIDTH} viewBox="0 0 100 100" style={animatedStyle}>

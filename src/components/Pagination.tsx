@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { theme } from '../constants/theme';
-import { type Data } from '../data/screens';
+import { type Data } from '@/src/constants/data';
 
 type PaginationCompProps = {
   index: number;
@@ -55,7 +55,7 @@ type PaginationProps = {
   screenWidth: number;
 };
 
-export function Pagination({ data, screenWidth, x }: PaginationProps) {
+export default function Pagination({ data, screenWidth, x }: PaginationProps) {
   return (
     <View style={styles.container}>
       {data.map((item, index) => (

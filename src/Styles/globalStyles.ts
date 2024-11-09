@@ -10,6 +10,7 @@ export const colors = {
   TextSecondary: '#616A73',
   TextHighlight: '#F0F0F0',
   Border: '#0061FF',
+  Danger: '#FF0000',
 };
 
 export const spacing = {
@@ -93,10 +94,13 @@ export const globalStyles = StyleSheet.create({
     width: 200,
   },
   title: {
+    fontFamily: 'Urbanist-Medium',
     color: colors.TextHighlight,
-    fontSize: fontSize.xxl,
-    fontWeight: 'bold',
+    fontSize: fontSize.huge,
+    lineHeight: spacing.xxxl,
     marginBottom: spacing.lg,
+    marginTop: spacing.xxxl,
+
   },
   link: {
     marginTop: spacing.md,
@@ -114,5 +118,38 @@ export const globalStyles = StyleSheet.create({
   resultText: {
     color: colors.TextHighlight,
     fontSize: fontSize.md,
+  },
+  loaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  loaderText: {
+    color: colors.Theme,
+    fontSize: fontSize.xs,
+    fontFamily: 'Urbanist-Regular',
+  },
+  inputContainer: {
+    flex: 1,
+    backgroundColor: colors.Background,
+    padding: spacing.lg,
+  },
+  cardListContainer: {
+    marginBottom: spacing.lg,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.Border,
+  },
+  buttonDanger: {
+    backgroundColor: colors.Danger, // Use a red color or a different color for danger
+    padding: spacing.md,
+    borderRadius: 8,
+    marginVertical: spacing.md,
+    alignItems: 'center',
   },
 });

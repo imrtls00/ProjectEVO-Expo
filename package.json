@@ -1,7 +1,7 @@
 {
   "name": "projectevo",
   "version": "1.0.0",
-  "main": "expo/AppEntry.js",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -12,6 +12,7 @@
     "@expo-google-fonts/urbanist": "^0.2.3",
     "@expo/metro-runtime": "~3.2.3",
     "@google/generative-ai": "^0.21.0",
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
@@ -44,8 +45,5 @@
     "@babel/core": "^7.26.0",
     "@types/react": "~18.2.79"
   },
-  "private": true,
-  "patchedDependencies": {
-    "react-native-snap-carousel@3.9.1": "patches/react-native-snap-carousel@3.9.1.patch"
-  }
+  "private": true
 }

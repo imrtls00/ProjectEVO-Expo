@@ -1,24 +1,31 @@
-// src/screens/ResultsScreen.tsx
-
 import React from "react";
 import {
   View,
   Linking,
   Alert,
   Text,
-  StyleSheet,
   ScrollView,
   Platform,
   Pressable,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { globalStyles, colors, spacing } from '@/src/Styles/globalStyles';
+import { useRouter } from "expo-router";
+import { globalStyles } from '@/src/Styles/globalStyles';
+import { useResults } from '@/src/context/ResultsContext';
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { result } = useLocalSearchParams<{ result: string }>();
+  const { results } = useResults();
   
-  const resultObj = JSON.parse(result);
+  if (!results) {
+    return (
+      <View style={globalStyles.container}>
+        <Text style={globalStyles.title}>No Results</Text>
+        <Text style={globalStyles.text}>Try asking something from the home screen.</Text>
+      </View>
+    );
+  }
+
+  const resultObj = JSON.parse(results);
   const action = resultObj[0].action;
   let displayMessage = resultObj[0].messageToShow;
   const body = resultObj[0].body;
@@ -44,7 +51,6 @@ export default function ResultsScreen() {
         message
       )}`;
     
-      await Linking.openURL(whatsappUrl);
       // Check if WhatsApp is installed
       const canOpen = await Linking.canOpenURL(whatsappUrl);
       if (canOpen) {
@@ -58,7 +64,6 @@ export default function ResultsScreen() {
     const setAlarm = async (hour: number, minute: number, message: string) => {
       if (Platform.OS === "android") {
         const alarmIntent = `intent://alarm`;
-        await Linking.openURL(alarmIntent);
         const canOpen = await Linking.canOpenURL(alarmIntent);
         if (canOpen) {
           await Linking.openURL(alarmIntent);
@@ -83,12 +88,11 @@ export default function ResultsScreen() {
       );
     };
 
-
     if (action.includes("NotAvailable")) {
       displayMessage = "Sorry, this feature is under-development and is currently unavailable in beta-mode.";
     } else if (action.includes("SendEmail")) {
       console.log("Send Email feature implementation");
-      openGmailApp("sp21-bse-071@cuilahore.edu.pk", subject, body);
+      openGmailApp(email, subject, body);
     } else if (action.includes("SummaryOfEmails")) {
       console.log("Summary of Emails feature implementation");
       Linking.openURL("https://gmail.app.goo.gl");
@@ -104,7 +108,7 @@ export default function ResultsScreen() {
       sendWhatsAppMessage("923076718155", WhatsAppMessage);
     } else if (action.includes("Call")) {
       console.log("Call feature implementation");
-      makePhoneCall("03076718155");
+      makePhoneCall(phone);
     } else if (action.includes("Instagram")) {
       console.log("Instagram Feature Implementation");
       Linking.openURL("https://instagram.com");
@@ -116,7 +120,6 @@ export default function ResultsScreen() {
         "Error occurred at Root Level, Error: Model returned an unknown action"
       );
     }
-
   }
 
   return (
@@ -132,9 +135,12 @@ export default function ResultsScreen() {
       >
         <Text style={globalStyles.buttonText}>Perform Action</Text>
       </Pressable>
-      <Pressable style={globalStyles.buttonSecondary} onPress={() => router.back()}>
+      <Pressable 
+        style={globalStyles.buttonSecondary} 
+        onPress={() => router.back()}
+      >
         <Text style={globalStyles.buttonText}>Go Back</Text>
       </Pressable>
     </View>
   );
-}
+} 

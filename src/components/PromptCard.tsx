@@ -4,7 +4,7 @@ import { globalStyles } from '@/src/Styles/globalStyles';
 
 const PromptCard = ({ text, onPress }: { text: string; onPress: () => void }) => (
   <Pressable style={globalStyles.card} onPress={onPress}>
-    <Text style={globalStyles.title}>{text}</Text>
+    <Text style={globalStyles.text}>{text}</Text>
   </Pressable>
 );
 
