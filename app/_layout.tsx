@@ -42,18 +42,18 @@ export default function RootLayout() {
 
   if (isFirstLaunch === null) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
+      null
     );
   }
 
   return (
-    <ResultsProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding/index" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ResultsProvider>
+    <>
+      <ResultsProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ResultsProvider>
+    </>
   );
 }
