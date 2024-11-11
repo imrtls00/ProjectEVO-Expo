@@ -11,10 +11,13 @@ import {
 import { useRouter } from "expo-router";
 import { globalStyles } from '@/src/Styles/globalStyles';
 import { useResults } from '@/src/context/ResultsContext';
+import { model } from "@/src/services/generativeAI";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getEmailSummmary } from "@/src/services/getEmailSummary";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { results } = useResults();
+  const { results, setResults } = useResults();
   
   if (!results) {
     return (
@@ -94,8 +97,14 @@ export default function ResultsScreen() {
       console.log("Send Email feature implementation");
       openGmailApp(email, subject, body);
     } else if (action.includes("SummaryOfEmails")) {
-      console.log("Summary of Emails feature implementation");
-      Linking.openURL("https://gmail.app.goo.gl");
+      // Linking.openURL("https://gmail.app.goo.gl");
+      async function fetchSummary() { 
+        const summary = await getEmailSummmary();
+        displayMessage = summary;
+      }
+      fetchSummary().then(() => Alert.alert("Summary of Emails", displayMessage));
+
+
     } else if (action.includes("ScheduleMeeting")) {
       console.log("Schedule Meeting feature implementation");
       gotoCalendar(subject, body);

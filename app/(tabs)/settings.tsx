@@ -141,12 +141,20 @@ export default function SettingsScreen() {
       return;
     }
 
+    let accessToken;
     if (!response || response.type !== "success" || !response.authentication) {
-      Alert.alert("Error", "Authentication is not available.");
-      return;
+      // Attempt to retrieve accessToken from AsyncStorage if not available
+      const storedAccessToken = await AsyncStorage.getItem("accessToken");
+      if (!storedAccessToken) {
+        Alert.alert("Error", "Authentication is not available.");
+        return;
+      }
+      accessToken = storedAccessToken;
+    } else {
+      accessToken = response.authentication.accessToken;
+      // Save accessToken to AsyncStorage for future use
+      await AsyncStorage.setItem("accessToken", accessToken);
     }
-
-    const { accessToken } = response.authentication;
 
     try {
       const emailResponse = await fetch(
@@ -165,14 +173,53 @@ export default function SettingsScreen() {
       }
 
       const emailData = await emailResponse.json();
-      console.log("Fetched Emails:", emailData);
+      const completeEmails = await Promise.all(emailData.messages.map(async (message) => {
+        const messageResponse = await fetch(
+          `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!messageResponse.ok) {
+          throw new Error(
+            `Failed to fetch message body: ${messageResponse.status} ${messageResponse.statusText}`
+          );
+        }
+
+        const messageBody = await messageResponse.json();
+        return { ...message, body: messageBody };
+      }));
+      console.log("Fetched Emails:", completeEmails);
 
       // Store emails in AsyncStorage
-      await AsyncStorage.setItem("fetchedEmails", JSON.stringify(emailData));
+      await AsyncStorage.setItem("fetchedEmails", JSON.stringify(completeEmails));
       Alert.alert("Success", "Fetched emails and stored in AsyncStorage.");
     } catch (error) {
       console.error("Error fetching emails:", error);
       Alert.alert("Error", "Failed to fetch emails.");
+    }
+  };
+
+  const getEmails = async () => {
+    try {
+      const storedEmails = await AsyncStorage.getItem("fetchedEmails");
+      if (storedEmails) {
+        const emails = JSON.parse(storedEmails);
+        console.log("Fetched Emails:", emails.messages[0].threadId);
+        Alert.alert("Success", "Fetched emails from AsyncStorage.");
+        return emails;
+      } else {
+        console.log("No emails found in AsyncStorage.");
+        Alert.alert("Error", "No emails found in AsyncStorage.");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching emails from AsyncStorage:", error);
+      Alert.alert("Error", "Failed to fetch emails from AsyncStorage.");
+      return [];
     }
   };
 

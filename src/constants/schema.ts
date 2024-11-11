@@ -24,7 +24,7 @@ export const actionSchema = {
       },
       messageToShow: {
         type: SchemaType.STRING,
-        description: "Response to show to the user on screen",
+        description: "Response to show to the user on screen, in-case of EmailSummary Action just reply: press the button to get summary",
       },
       body: {
         type: SchemaType.STRING,
