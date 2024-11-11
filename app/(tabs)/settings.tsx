@@ -16,21 +16,19 @@ export default function SettingsScreen() {
     useState(false);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    // clientId: "YOUR_EXPO_CLIENT_ID",
-    // iosClientId: "YOUR_IOS_CLIENT_ID",
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_GOOGLE_OAUTH,
-    // webClientId: "YOUR_WEB_CLIENT_ID",
-    scopes: ["profile", "email"],
+    scopes: [
+      "profile",
+      "email",
+      "https://www.googleapis.com/auth/gmail.readonly",
+    ],
   });
 
-  // Define the interface for Google user data
   interface GoogleUser {
     name: string;
     email: string;
-    // Add other properties if needed
   }
 
-  // Update the state type for googleUser
   const [googleUser, setGoogleUser] = useState<GoogleUser | null>(null);
 
   useEffect(() => {
@@ -137,6 +135,47 @@ export default function SettingsScreen() {
     // Add any other sign-out logic if needed (e.g., revoking tokens)
   };
 
+  const fetchEmails = async () => {
+    if (!googleUser) {
+      Alert.alert("Error", "You need to be signed in to fetch emails.");
+      return;
+    }
+
+    if (!response || response.type !== "success" || !response.authentication) {
+      Alert.alert("Error", "Authentication is not available.");
+      return;
+    }
+
+    const { accessToken } = response.authentication;
+
+    try {
+      const emailResponse = await fetch(
+        "https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=10",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!emailResponse.ok) {
+        throw new Error(
+          `Failed to fetch emails: ${emailResponse.status} ${emailResponse.statusText}`
+        );
+      }
+
+      const emailData = await emailResponse.json();
+      console.log("Fetched Emails:", emailData);
+
+      // Store emails in AsyncStorage
+      await AsyncStorage.setItem("fetchedEmails", JSON.stringify(emailData));
+      Alert.alert("Success", "Fetched emails and stored in AsyncStorage.");
+    } catch (error) {
+      console.error("Error fetching emails:", error);
+      Alert.alert("Error", "Failed to fetch emails.");
+    }
+  };
+
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Settings</Text>
@@ -163,6 +202,10 @@ export default function SettingsScreen() {
 
       <Pressable style={globalStyles.button} onPress={handleShowOnboarding}>
         <Text style={globalStyles.buttonText}>Show Onboarding Screen</Text>
+      </Pressable>
+
+      <Pressable style={globalStyles.button} onPress={fetchEmails}>
+        <Text style={globalStyles.buttonText}>Fetch First 10 Emails</Text>
       </Pressable>
 
       <Pressable style={globalStyles.buttonDanger} onPress={handleDeleteData}>

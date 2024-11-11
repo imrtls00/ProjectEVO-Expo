@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Text, View, FlatList } from "react-native";
+import { Text, View, FlatList, Alert } from "react-native";
 import { router } from "expo-router";
 import { useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { useResults } from '@/src/context/ResultsContext';
+import NetInfo from "@react-native-community/netinfo";
 
 // Import from src folder using alias
+import { useResults } from '@/src/context/ResultsContext';
 import { PromptCard, InputSection } from "@/src/components";
 import { useSpeechRecognition } from "@/src/hooks/useSpeechRecognition";
 import { model } from "@/src/services/generativeAI";
@@ -43,6 +44,14 @@ export default function HomeScreen() {
 
   const handlePrompt = async () => {
     if (!inputValue) return;
+
+    // Check internet connection
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Alert.alert("Error", "Internet connection is required for this task.");
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await model.generateContent(inputValue);
