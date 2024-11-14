@@ -251,6 +251,10 @@ export default function SettingsScreen() {
         <Text style={globalStyles.buttonText}>Show Onboarding Screen</Text>
       </Pressable>
 
+      <Pressable style={globalStyles.button} onPress={ () => router.push("/calendar")}>
+        <Text style={globalStyles.buttonText}>Goto Calendar</Text>
+      </Pressable>
+
       <Pressable style={globalStyles.button} onPress={fetchEmails}>
         <Text style={globalStyles.buttonText}>Fetch First 10 Emails</Text>
       </Pressable>

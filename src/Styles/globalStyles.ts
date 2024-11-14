@@ -1,16 +1,16 @@
 // globalStyles.ts
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export const colors = {
-  Theme: '#0061FF',
-  Background: '#010616',
-  BackgroundSecondary: '#010F2D',
-  Heading: '#F7FAFD',
-  Text: '#ADB1B8',
-  TextSecondary: '#616A73',
-  TextHighlight: '#F0F0F0',
-  Border: '#0061FF',
-  Danger: '#FF0000',
+  Theme: "#0061FF",
+  Background: "#010616",
+  BackgroundSecondary: "#010F2D",
+  Heading: "#F7FAFD",
+  Text: "#ADB1B8",
+  TextSecondary: "#616A73",
+  TextHighlight: "#F0F0F0",
+  Border: "#0061FF",
+  Danger: "#FF0000",
 };
 
 export const spacing = {
@@ -51,21 +51,21 @@ export const globalStyles = StyleSheet.create({
   heading: {
     color: colors.Heading,
     fontSize: fontSize.huge,
-    fontFamily: 'Urbanist-Medium',
-    fontWeight: 'bold',
+    fontFamily: "Urbanist-Medium",
+    fontWeight: "bold",
     lineHeight: spacing.xxxl,
   },
   text: {
     color: colors.Text,
     fontSize: fontSize.md,
-    fontFamily: 'Urbanist-Regular',
+    fontFamily: "Urbanist-Regular",
   },
   button: {
     backgroundColor: colors.Theme,
     padding: spacing.md,
     borderRadius: borderRadius.circle,
     marginVertical: spacing.xs,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonSecondary: {
     backgroundColor: colors.Background,
@@ -78,7 +78,7 @@ export const globalStyles = StyleSheet.create({
   buttonText: {
     color: colors.TextHighlight,
     fontSize: fontSize.md,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
     flex: 1,
@@ -94,13 +94,12 @@ export const globalStyles = StyleSheet.create({
     width: 200,
   },
   title: {
-    fontFamily: 'Urbanist-Medium',
+    fontFamily: "Urbanist-Medium",
     color: colors.TextHighlight,
     fontSize: fontSize.huge,
     lineHeight: spacing.xxxl,
     marginBottom: spacing.lg,
     marginTop: spacing.xxxl,
-
   },
   link: {
     marginTop: spacing.md,
@@ -112,7 +111,7 @@ export const globalStyles = StyleSheet.create({
   },
   resultContainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     marginVertical: spacing.md,
   },
   resultText: {
@@ -120,14 +119,14 @@ export const globalStyles = StyleSheet.create({
     fontSize: fontSize.md,
   },
   loaderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
   },
   loaderText: {
     color: colors.Theme,
     fontSize: fontSize.xs,
-    fontFamily: 'Urbanist-Regular',
+    fontFamily: "Urbanist-Regular",
   },
   inputContainer: {
     flex: 1,
@@ -136,11 +135,12 @@ export const globalStyles = StyleSheet.create({
   },
   cardListContainer: {
     marginBottom: spacing.lg,
+    overflow: "visible",
   },
   settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.Border,
@@ -150,6 +150,20 @@ export const globalStyles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: 8,
     marginVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
+  },
+  calendarItem: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 5,
+    // Add any other styles you need
+  },
+  eventItem: {
+    // Define your styles here, for example:
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 5,
+    marginVertical: 10,
   },
 });
