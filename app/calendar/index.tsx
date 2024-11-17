@@ -3,6 +3,7 @@ import { View, Text, Button, FlatList } from 'react-native';
 import * as Calendar from 'expo-calendar';
 import { globalStyles } from '@/src/Styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 export default function CalendarScreen() {
   const [calendars, setCalendars] = useState([]);
@@ -12,7 +13,6 @@ export default function CalendarScreen() {
   useEffect(() => {
     const fetchCalendars = async () => {
       try {
-        
         const { status } = await Calendar.requestCalendarPermissionsAsync();
         if (status === 'granted') {
           const fetchedCalendars = await Calendar.getCalendarsAsync();
@@ -48,7 +48,7 @@ export default function CalendarScreen() {
     );
   }
   
-  const filteredCalendars = calendars.filter(calendar => calendar.id === "14");
+  const filteredCalendars = calendars.filter(calendar => calendar.name === "University Schedule");
 
   const storeEventsInAsyncStorage = async (events) => {
     try {
@@ -70,6 +70,10 @@ export default function CalendarScreen() {
 
   return (
     <View style={globalStyles.container}>
+      <Button
+        title="Go Back"
+        onPress={() => router.navigate("(tabs)/settings")}
+      />
       <Text style={globalStyles.title}>Calendars</Text>
       <FlatList
         data={filteredCalendars}
