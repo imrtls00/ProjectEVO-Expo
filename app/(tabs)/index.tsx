@@ -15,6 +15,9 @@ import { promptData } from "@/src/constants/data";
 import { globalStyles } from "@/src/Styles/globalStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { appList, openApp } from "@/src/services/appList";
+import { getCurrentCity } from "@/src/services/getCurrentCity";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { getContactsList } from "@/src/services/getContactsList";
 
 export default function HomeScreen() {
   const [inputValue, setInputValue] = useState("");
@@ -79,6 +82,29 @@ export default function HomeScreen() {
 
   getGoogleUser();
   appList();
+  useEffect(() => {
+    const fetchCity = async () => {
+      try {
+        const city = await getCurrentCity();
+        console.log("Current city:", city);
+      } catch (error) {
+        console.error("Error fetching city:", error);
+      }
+    };
+
+    const fetchContacts = async () => {
+      try {
+        const contacts = await getContactsList();
+        console.log("Contacts:", contacts.length);
+      } catch (error) {
+        console.error("Error fetching contacts:", error);
+      }
+    }
+
+    //fetchContacts();
+    //fetchCity();
+  }, []);
+
 
   return (
     <View style={globalStyles.inputContainer}>

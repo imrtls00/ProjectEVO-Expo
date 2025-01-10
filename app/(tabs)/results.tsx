@@ -14,6 +14,7 @@ import { useResults } from '@/src/context/ResultsContext';
 import { model } from "@/src/services/generativeAI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getEmailSummmary } from "@/src/services/getEmailSummary";
+import Markdown from 'react-native-markdown-display';
 
 export default function ResultsScreen() {
   const router = useRouter();

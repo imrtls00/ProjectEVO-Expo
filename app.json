@@ -51,7 +51,6 @@
       ],
       "expo-font",
       [
-        
         "expo-speech-recognition",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to use the microphone.",
@@ -61,7 +60,13 @@
           ]
         }
       ],
-      "expo-router"
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
+        }
+      ],
+      "expo-alarm-module"
     ],
     "extra": {
       "eas": {

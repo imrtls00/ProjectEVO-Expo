@@ -11,6 +11,9 @@ export const getEmailSummmary = async () => {
     try {
       const storedEmails = await AsyncStorage.getItem("fetchedEmails");
       if (storedEmails) {
+
+        console.log("Generating Email Summary...");
+
         const result = await model.generateContent("Summarize the following: " + storedEmails);
         const response = await result.response.text();
 
