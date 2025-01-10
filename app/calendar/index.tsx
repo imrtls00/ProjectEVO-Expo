@@ -42,12 +42,10 @@ export default function CalendarScreen() {
   };
 
   const createCalendarEvent = async () => {
+
     try {
       const defaultCalendarSource = calendars.find(calendar => calendar.source.name === 'Default');
-      const calendarId = 14;
-
-      // debug
-      console.log('Creating event in calendar with ID:', calendarId);
+      const calendarId = filteredCalendars[0].id;
 
       const startDate = new Date();
       startDate.setHours(startDate.getHours() + 1); // Set the event to start 1 hour from now
@@ -61,23 +59,15 @@ export default function CalendarScreen() {
         notes: 'Discuss project updates',
       });
 
-      console.log('Event created with ID:', eventId);
+      console.log('Event created with ID: ' + eventId + " in calendar name: " + filteredCalendars[0].name);
       Alert.alert('Success', 'Event created successfully');
     } catch (error) {
       console.error('Error creating event:', error);
       Alert.alert('Error', 'Failed to create event');
     }
   };
-
-  if (loading) {
-    return (
-      <View style={globalStyles.container}>
-        <Text>Loading calendars...</Text>
-      </View>
-    );
-  }
   
-  const filteredCalendars = calendars.filter(calendar => calendar.name === "University Schedule");
+  const filteredCalendars = calendars.filter(calendar => calendar.name === "imrtls00's Schedule");
 
   const storeEventsInAsyncStorage = async (events) => {
     try {
@@ -98,6 +88,13 @@ export default function CalendarScreen() {
 
   storeEventsInAsyncStorage(events);
 
+  if (loading) {
+    return (
+      <View style={globalStyles.container}>
+        <Text>Loading calendars...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={globalStyles.container}>
