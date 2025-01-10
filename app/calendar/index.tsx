@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList } from 'react-native';
+import { View, Text, Button, FlatList, Alert } from 'react-native';
 import * as Calendar from 'expo-calendar';
 import { globalStyles } from '@/src/Styles/globalStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,14 +15,13 @@ export default function CalendarScreen() {
       try {
         const { status } = await Calendar.requestCalendarPermissionsAsync();
         if (status === 'granted') {
-          const fetchedCalendars = await Calendar.getCalendarsAsync();
-          setCalendars(fetchedCalendars);
+          const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+          setCalendars(calendars);
         } else {
-          alert("Calendar permission is required to access your calendars. Please enable it in your settings.");
-          console.error("Calendar permission denied");
+          console.log('Calendar permissions denied');
         }
       } catch (error) {
-        console.error("Error fetching calendars:", error);
+        console.error('Error fetching calendars:', error);
       } finally {
         setLoading(false);
       }
@@ -35,8 +34,38 @@ export default function CalendarScreen() {
     try {
       const fetchedEvents = await Calendar.getEventsAsync([calendarId], from, to);
       setEvents(fetchedEvents);
+
+
     } catch (error) {
       console.error("Error fetching events:", error);
+    }
+  };
+
+  const createCalendarEvent = async () => {
+    try {
+      const defaultCalendarSource = calendars.find(calendar => calendar.source.name === 'Default');
+      const calendarId = 14;
+
+      // debug
+      console.log('Creating event in calendar with ID:', calendarId);
+
+      const startDate = new Date();
+      startDate.setHours(startDate.getHours() + 1); // Set the event to start 1 hour from now
+      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
+
+      const eventId = await Calendar.createEventAsync(calendarId, {
+        title: 'Meeting with Asad',
+        startDate,
+        endDate,
+        timeZone: 'GMT',
+        notes: 'Discuss project updates',
+      });
+
+      console.log('Event created with ID:', eventId);
+      Alert.alert('Success', 'Event created successfully');
+    } catch (error) {
+      console.error('Error creating event:', error);
+      Alert.alert('Error', 'Failed to create event');
     }
   };
 
@@ -59,6 +88,7 @@ export default function CalendarScreen() {
         startDate: event.startDate,
         endDate: event.endDate,
       }));
+
       await AsyncStorage.setItem('events', JSON.stringify(eventsToStore));
       console.log('Events stored successfully in AsyncStorage.');
     } catch (error) {
@@ -67,6 +97,7 @@ export default function CalendarScreen() {
   };
 
   storeEventsInAsyncStorage(events);
+
 
   return (
     <View style={globalStyles.container}>
@@ -99,6 +130,7 @@ export default function CalendarScreen() {
           </View>
         )}
       />
+      <Button title="Create Event" onPress={createCalendarEvent} />
     </View>
   );
 }

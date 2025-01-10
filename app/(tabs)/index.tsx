@@ -14,7 +14,7 @@ import { theme } from "@/src/constants/theme";
 import { promptData } from "@/src/constants/data";
 import { globalStyles } from "@/src/Styles/globalStyles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import appList from "@/src/services/appList";
+import { appList, openApp } from "@/src/services/appList";
 
 export default function HomeScreen() {
   const [inputValue, setInputValue] = useState("");
