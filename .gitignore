@@ -37,4 +37,5 @@ yarn-error.*
 .env
 secret.ts
 temp
+temp-1
 EVO-project-details.txt

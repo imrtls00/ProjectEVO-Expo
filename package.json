@@ -27,6 +27,7 @@
     "expo-auth-session": "~5.5.2",
     "expo-calendar": "~13.0.5",
     "expo-contacts": "~13.0.5",
+    "expo-dev-client": "~4.0.29",
     "expo-font": "~12.0.10",
     "expo-location": "~17.0.1",
     "expo-module-scripts": "^3.5.2",
