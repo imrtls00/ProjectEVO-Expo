@@ -259,6 +259,10 @@ export default function SettingsScreen() {
         <Text style={globalStyles.buttonText}>Fetch First 10 Emails</Text>
       </Pressable>
 
+      <Pressable style={globalStyles.button} onPress={ () => router.push("/accessiblity")}>
+        <Text style={globalStyles.buttonText}>Screen Reader Test</Text>
+      </Pressable>
+
       <Pressable style={globalStyles.buttonDanger} onPress={handleDeleteData}>
         <Text style={globalStyles.buttonText}>Delete / Reset all my data</Text>
       </Pressable>
