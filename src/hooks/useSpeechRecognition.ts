@@ -1,8 +1,8 @@
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
 
 export function useSpeechRecognition(
-  setInputValue: (text: string) => void, 
-  recognizing: boolean, 
+  setInputValue: (text: string) => void,
+  recognizing: boolean,
   setRecognizing: (val: boolean) => void
 ) {
   useSpeechRecognitionEvent("start", () => setRecognizing(true));
@@ -26,4 +26,4 @@ export function useSpeechRecognition(
   };
 
   return handleMicPress;
-} 
+}
