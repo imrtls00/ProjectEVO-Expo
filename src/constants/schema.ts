@@ -14,8 +14,11 @@ export const actionSchema = {
           "SendEmail",
           "ScheduleMeeting",
           "SetAlarm",
+          "SetReminder",
+          "OpenApp",
           "TextWhatsApp",
           "Call",
+          "CreateCalendarEvent",
           "Instagram",
           "Weather",
           "NotAvailable",
@@ -35,6 +38,18 @@ export const actionSchema = {
         type: SchemaType.STRING,
         description:
           "Subject or Title of the email, message, alarm, meeting, etc.",
+      },
+      email: {
+        type: SchemaType.STRING,
+        description: "Email address to send email to",
+      },
+      contactName: {
+        type: SchemaType.STRING,
+        description: "Name of the contact to call",
+      },
+      appName: {
+        type: SchemaType.STRING,
+        description: "Name of the app to open",
       },
     },
     required: ["action", "messageToShow"],
