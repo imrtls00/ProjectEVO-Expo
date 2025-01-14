@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
+import { MaterialSwitch } from "@/src/components/MaterialSwitch";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -88,6 +89,7 @@ export default function SettingsScreen() {
       "submitPromptAutomatically",
       JSON.stringify(!submitPromptAutomatically)
     );
+    console.log("Toggle Submit Prompt Automatically:", !submitPromptAutomatically);
   };
 
   const handleTogglePerformAction = () => {
@@ -97,6 +99,7 @@ export default function SettingsScreen() {
       "performActionAutomatically",
       JSON.stringify(!performActionAutomatically)
     );
+    console.log("Toggle Perform Action Automatically:", !performActionAutomatically);
   };
 
   const handleShowOnboarding = () => {
@@ -229,22 +232,24 @@ export default function SettingsScreen() {
 
       <View style={globalStyles.settingItem}>
         <Text style={globalStyles.text}>
-          Submit prompt automatically when using voice input
+          Submit Voice Prompt Automatically
         </Text>
-        <Switch
-          value={submitPromptAutomatically}
-          onValueChange={handleToggleSubmitPrompt}
-        />
+        <MaterialSwitch 
+        fluid={true}
+        onPress={handleToggleSubmitPrompt}
+        selected={submitPromptAutomatically}
+      />
       </View>
 
       <View style={globalStyles.settingItem}>
         <Text style={globalStyles.text}>
-          Perform the action automatically on results screen
+          Perform Actions Automatically
         </Text>
-        <Switch
-          value={performActionAutomatically}
-          onValueChange={handleTogglePerformAction}
-        />
+        <MaterialSwitch 
+        fluid={true}
+        onPress={handleTogglePerformAction}
+        selected={performActionAutomatically}
+      />
       </View>
 
       <Pressable style={globalStyles.button} onPress={handleShowOnboarding}>
@@ -268,7 +273,7 @@ export default function SettingsScreen() {
       </Pressable>
 
       {googleUser ? (
-        <View style={globalStyles.settingItem}>
+        <View style={globalStyles.signInButton}>
           <Pressable
             style={globalStyles.buttonDanger}
             onPress={handleGoogleSignOut}

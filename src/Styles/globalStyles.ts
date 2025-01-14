@@ -121,12 +121,14 @@ export const globalStyles = StyleSheet.create({
   loaderContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
+    gap: spacing.xs,
+    marginHorizontal: spacing.md,
   },
   loaderText: {
     color: colors.Theme,
     fontSize: fontSize.xs,
     fontFamily: "Urbanist-Regular",
+    marginVertical: spacing.lg,
   },
   inputContainer: {
     flex: 1,
@@ -141,9 +143,13 @@ export const globalStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: spacing.md,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.Border,
+
+  },
+  signInButton: {
+    marginVertical: spacing.md,
   },
   buttonDanger: {
     backgroundColor: colors.Danger, // Use a red color or a different color for danger

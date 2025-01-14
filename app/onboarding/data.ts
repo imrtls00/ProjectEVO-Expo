@@ -15,7 +15,7 @@ export const onboardingData = [
   {
     id: 3,
     image: require("@/assets/images/onboarding-3.png"),
-    title: "Need Permissions",
+    title: "✅ All Permissions Granted!",
     text: "Please allow the required permissions",
   },
 ];
