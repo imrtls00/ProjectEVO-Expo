@@ -172,4 +172,23 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 10,
   },
+
+  /* BottomSheet Styles */
+  sheetContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "white",
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  sheetContent: {
+    flexGrow: 1,
+  },
+  sheetText: {
+    fontSize: 16,
+    color: "#333",
+  },
 });
