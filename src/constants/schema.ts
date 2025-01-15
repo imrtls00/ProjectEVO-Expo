@@ -1,57 +1,94 @@
 import { SchemaType } from "@google/generative-ai";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const currentDate = new Date().toISOString();
+export const getUserName = async (): Promise<string | null> => {
+  try {
+    const userName = await AsyncStorage.getItem('UserName');
+    return userName;
+  } catch (error) {
+    console.error('Error fetching UserName from AsyncStorage', error);
+    return null;
+  }
+};
 
 export const actionSchema = {
-  description: "List of actions to be performed",
+  description: "List of actions to be performed. Name of the user is: " + getUserName + " Current Date and Time is" + currentDate,
   type: SchemaType.ARRAY,
   items: {
     type: SchemaType.OBJECT,
     properties: {
       action: {
         type: SchemaType.STRING,
-        description: "any of the following",
+        description: "Type of action to perform",
         enum: [
-          "SummaryOfEmails",
           "SendEmail",
+          "Call",
+          "TextWhatsApp",
+          "OpenApp",
+          "MySchedule",
           "ScheduleMeeting",
+          "CreateCalendarEvent",
+          "Weather",
+          "SummaryOfEmails",
           "SetAlarm",
           "SetReminder",
-          "OpenApp",
-          "TextWhatsApp",
-          "Call",
-          "CreateCalendarEvent",
-          "Instagram",
-          "Weather",
           "NotAvailable",
         ],
         nullable: false,
       },
       messageToShow: {
         type: SchemaType.STRING,
-        description: "Response to show to the user on screen, in-case of EmailSummary Action just reply: press the button to get summary",
+        description: "Message displayed to the user before action execution. For example 'SummaryOfEmails', instruct to press a button below.",
       },
-      body: {
+
+      // Common Properties
+      contactName: {
         type: SchemaType.STRING,
-        description:
-          "Message to be used for the action, such as email or message body, etc.",
+        description: "Name of the contact (Used in calls, emails, and WhatsApp)",
       },
-      subject: {
+      phoneNumber: {
         type: SchemaType.STRING,
-        description:
-          "Subject or Title of the email, message, alarm, meeting, etc.",
+        description: "Phone number of the contact (Used in calls and WhatsApp)",
       },
       email: {
         type: SchemaType.STRING,
-        description: "Email address to send email to",
+        description: "Email address of the recipient",
       },
-      contactName: {
+      subject: {
         type: SchemaType.STRING,
-        description: "Name of the contact to call",
+        description: "Subject or title - Used for emails, reminders, calendar events etc or whenever possible",
+      },
+      body: {
+        type: SchemaType.STRING,
+        description: "Message content for emails or WhatsApp",
       },
       appName: {
         type: SchemaType.STRING,
         description: "Name of the app to open",
       },
+      city: {
+        type: SchemaType.STRING,
+        description: "City name for fetching weather",
+      },
+      eventName: {
+        type: SchemaType.STRING,
+        description: "Title of the calendar event or meeting",
+      },
+      duration: {
+        type: SchemaType.INTEGER,
+        description: "Duration for scheduled meetings or events in minutes",
+      },
+      time: {
+        type: SchemaType.STRING,
+        description: "Time for setting alarms, reminders, or scheduling",
+      },
+      countdownTimer: {
+        type: SchemaType.BOOLEAN,
+        description: "If true, show a sleek countdown timer for reminders/alarms"
+      },
     },
-    required: ["action", "messageToShow"],
-  },
+
+    required: ["action", "messageToShow", "subject"]
+  }
 };

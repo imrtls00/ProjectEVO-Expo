@@ -1,27 +1,71 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Linking,
   Alert,
   Text,
   ScrollView,
-  Platform,
   Pressable,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalStyles } from "@/src/Styles/globalStyles";
 import { useResults } from "@/src/context/ResultsContext";
-import { model } from "@/src/services/generativeAI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getEmailSummmary } from "@/src/services/getEmailSummary";
+import {
+  getCalendars,
+  getCalendarEvents,
+  createCalendarEvent,
+  deleteCalendarEvent,
+} from "@/src/services/calendar";
+import {
+  scheduleAlarm,
+  removeAllAlarms,
+  removeAlarm,
+  stopAlarm,
+} from "expo-alarm-module";
+import { scheduleNotification } from "@/src/services/notification";
 import Markdown from "react-native-markdown-display";
-import { appList, openApp } from "@/src/services/appList"; // Import functions from appList.ts
-
-import { scheduleAlarm, stopAlarm, removeAlarm } from "expo-alarm-module";
+import { appList, openApp } from "@/src/services/getAppList";
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const { results, setResults } = useResults();
+  const { results } = useResults();
+  const [contacts, setContacts] = useState([]);
+  const [apps, setApps] = useState([]);
+  const [city, setCity] = useState("");
+  const [dynamicContent, setDynamicContent] = useState<React.ReactNode>(null);
+  const [performActionAutomatically, setPerformActionAutomatically] =
+    useState(false);
+  const [emailInput, setEmailInput] = useState(""); // Store user input for email
+  const [alarmActive, setAlarmActive] = useState(false);
+
+  useEffect(() => {
+    /** Fetch stored contacts, app list, and city from AsyncStorage */
+    async function fetchStoredData() {
+      try {
+        const storedContacts = await AsyncStorage.getItem("contacts");
+        const storedApps = await AsyncStorage.getItem("appList");
+        const storedCity = await AsyncStorage.getItem("city");
+        const storedAutoAction = await AsyncStorage.getItem(
+          "performActionAutomatically"
+        );
+
+        if (storedContacts) setContacts(JSON.parse(storedContacts));
+        if (storedApps) setApps(JSON.parse(storedApps));
+        if (storedCity) setCity(storedCity);
+        if (storedAutoAction !== null)
+          setPerformActionAutomatically(JSON.parse(storedAutoAction));
+
+        console.log("Loaded AsyncStorage data successfully.");
+      } catch (error) {
+        console.error("Error fetching stored data:", error);
+      }
+    }
+
+    fetchStoredData();
+  }, []);
 
   if (!results) {
     return (
@@ -35,203 +79,277 @@ export default function ResultsScreen() {
   }
 
   const resultObj = JSON.parse(results);
-  const action = resultObj[0].action;
-  let displayMessage = resultObj[0].messageToShow;
-  const body = resultObj[0].body;
-  const subject = resultObj[0].subject;
-  const email = "sp21-bse-071@cuilahore.edu.pk";
-  const phone = "03076718155";
-  const appName = resultObj[0].appName;
+  const action = resultObj[0]?.action || "";
+  let displayMessage = resultObj[0]?.messageToShow || "";
+  const body = resultObj[0]?.body || "";
+  const subject = resultObj[0]?.subject || "";
+  const contactName = resultObj[0]?.contactName || "";
+  const appName = resultObj[0]?.appName || "";
 
-  function actionPerformer(action: string) {
-    const openGmailApp = async (
-      email: string,
-      subject: string,
-      body: string
-    ) => {
-      const gmailUrl = `mailto:${email}?subject=${encodeURIComponent(
-        subject
-      )}&body=${encodeURIComponent(body)}`;
-      await Linking.openURL(gmailUrl);
-    };
+  console.log("Received Action:", action);
 
-    const makePhoneCall = async (phoneNumber: string) => {
-      const phoneUrl = `tel:${phoneNumber}`;
-      await Linking.openURL(phoneUrl);
-    };
+  /** Finds a contact with partial matching */
+  const findContact = (name: string) => {
+    return contacts.find((c) =>
+      c.name.toLowerCase().includes(name.toLowerCase())
+    );
+  };
 
-    const sendWhatsAppMessage = async (
-      phoneNumber: string,
-      message: string
-    ) => {
-      const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
-        message
-      )}`;
+  /** Finds an email from stored contacts */
+  const getEmail = (name: string) => {
+    const contact = findContact(name);
+    return contact?.emails?.[0]?.email || null;
+  };
 
-      // Check if WhatsApp is installed
-      const canOpen = await Linking.canOpenURL(whatsappUrl);
-      if (canOpen) {
-        // Open WhatsApp with the message
-        await Linking.openURL(whatsappUrl);
-      } else {
-        Alert.alert("Error", "WhatsApp is not installed on this device");
-      }
-    };
+  /** Finds a phone number from stored contacts */
+  const getPhoneNumber = (name: string) => {
+    const contact = findContact(name);
+    return contact?.phoneNumbers?.[0]?.number || null;
+  };
 
-    // const setAlarm = async (hour: number, minute: number, message: string) => {
-    //   if (Platform.OS === "android") {
-    //     const alarmIntent = `intent://alarm`;
-    //     const canOpen = await Linking.canOpenURL(alarmIntent);
-    //     if (canOpen) {
-    //       await Linking.openURL(alarmIntent);
-    //     } else {
-    //       Alert.alert("Error", "Unable to set alarm");
-    //     }
-    //   } else {
-    //     Alert.alert("Error", "Setting alarms is only supported on Android");
-    //   }
-    // };
+  /** Finds an app package name from stored apps */
+  const getAppPackage = (name: string) => {
+    const app = apps.find((a) => a.label.toLowerCase() === name.toLowerCase());
+    return app?.packageName || null;
+  };
 
-    const gotoCalendar = async (subject: string, body: string) => {
-      router.push("/calendar");
-    };
+  /** Send an email */
+  const sendEmail = async () => {
+    let email = getEmail(contactName);
+    if (!email) {
+      console.log(`No email found for ${contactName}`);
+      return;
+    }
 
-    const openWeatherPage = (city: string) => {
-      const weatherUrl = `https://www.google.com/search?q=weather+in+${encodeURIComponent(
-        city
-      )}`;
-      Linking.openURL(weatherUrl).catch((err) =>
-        console.error("Failed to open URL:", err)
-      );
-    };
+    const gmailUrl = `mailto:${email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+    await Linking.openURL(gmailUrl);
+  };
 
-    if (action.includes("NotAvailable")) {
-      displayMessage =
-        "Sorry, this feature is under-development and is currently unavailable in beta-mode.";
-    } else if (action.includes("SendEmail")) {
-      console.log("Send Email feature implementation");
-      openGmailApp(email, subject, body);
-    } else if (action.includes("SummaryOfEmails")) {
-      // Linking.openURL("https://gmail.app.goo.gl");
-      async function fetchSummary() {
-        const summary = await getEmailSummmary();
-        displayMessage = summary;
-      }
-      fetchSummary().then(() =>
-        Alert.alert("Summary of Emails", displayMessage)
-      );
-    } else if (action.includes("ScheduleMeeting")) {
-      console.log("Schedule Meeting feature implementation");
-      gotoCalendar(subject, body);
-    // } else if (action.includes("SetAlarm")) {
-    //   console.log("Set Alarm feature implementation");
-    //   setAlarm(10, 30, subject);
-    } else if (action.includes("TextWhatsApp")) {
-      console.log("Text WhatsApp feature implementation");
-      var WhatsAppMessage = subject + ":\n\n" + body;
-      sendWhatsAppMessage("923076718155", WhatsAppMessage);
-    } else if (action.includes("Call")) {
-      console.log("Call feature implementation");
-      makePhoneCall(phone);
-    } else if (action.includes("Instagram")) {
-      console.log("Instagram Feature Implementation");
-      Linking.openURL("https://instagram.com");
-    } else if (action.includes("Weather")) {
-      console.log("Weather Feature Implementation");
-      openWeatherPage("");
-    } else if (action.includes("OpenApp")) {
-      console.log("Open App feature implementation");
-      console.log(resultObj[0].appName);
-      const openAppByName = async (appName: string) => {
-        try {
-          // Get the list of installed apps
-          const apps = await appList();
+  /** Show weather in the dynamic view */
+  const showWeather = () => {
+    if (!city) {
+      Alert.alert("Error", "City not found. Please set it in settings.");
+      return;
+    }
+    setDynamicContent(
+      <View>
+        <Text style={globalStyles.text}>Weather in {city}:</Text>
+        <Text>Fetching weather...</Text>
+      </View>
+    );
+  };
 
-          // Log installed apps to confirm structure
-          console.log("Installed Apps:", apps);
+  /** Display email summary */
+  const showEmailSummary = async () => {
+    const summary = await getEmailSummmary();
+    setDynamicContent(<Text style={globalStyles.text}>{summary}</Text>);
+  };
 
-          // Ensure apps array is valid
-          if (!Array.isArray(apps) || apps.length === 0) {
-            console.error("No installed apps found.");
-            return;
-          }
+  /** Schedule a meeting and display event details */
+  const scheduleMeeting = async () => {
+    const calendars = await getCalendars();
+    if (!calendars.length) {
+      Alert.alert("Error", "No calendars found.");
+      return;
+    }
 
-          // Find the app by matching the `label` (case-insensitive)
-          const matchedApp = apps.find(
-            (app) =>
-              app?.label && app.label.toLowerCase() === appName.toLowerCase()
-          );
+    const duration = resultObj[0]?.duration || 60;
 
-          if (matchedApp) {
-            console.log(`Opening app: ${matchedApp.label}`);
-            await openApp(matchedApp.packageName); // Open app using package name
-          } else {
-            console.error(`App "${appName}" is not installed.`);
-          }
-        } catch (error) {
-          console.error("Error fetching or opening app:", error);
-        }
-      };
-      openAppByName(resultObj[0].appName);
-    } else if (action.includes("SetReminder") || action.includes("SetAlarm")) {
-      console.log("Reminder feature implementation");
-      const dismissAlarm = () => {
-        console.log("Stopping and removing alarm...");
-    
-        // Stop any active alarm sound
-        stopAlarm();
-    
-        // Remove the scheduled alarm by UID
-        removeAlarm("alarm10sec");
-    
-        console.log("Alarm dismissed.");
-    };
-      const setAlarmIn10Seconds = () => {
-        const newDate = new Date();
-        newDate.setSeconds(newDate.getSeconds() + 10); // Set alarm for 10 seconds later
+    const calendarId = calendars[8].id;
+    const eventId = await createCalendarEvent(
+      calendarId,
+      subject,
+      body,
+      new Date().toISOString(),
+      duration
+    );
 
-        scheduleAlarm({
-          uid: "alarm10sec",
-          day: newDate,
-          title: "Wake Up!",
-          description: "This is an auto-set alarm after 10 seconds.",
-          snoozeInterval: 5,
-          repeating: false, // No repetition
-          active: true,
-        } as any);
-
-        console.log("Alarm set for 10 seconds later!");
-
-            // Auto-dismiss alarm in 15 seconds (5 sec after it rings)
-    setTimeout(() => {
-      dismissAlarm();
-  }, 15000); // 15,000ms = 15 seconds
-      };
-      setAlarmIn10Seconds();
-
-    } else if (action.includes("CreateCalendarEvent")) {
-      console.log("Create Calendar Event feature implementation");
-      gotoCalendar(subject, body);
-    } else {
-      console.log(
-        "Error occurred at Root Level, Error: Model returned an unknown action"
+    if (eventId) {
+      setDynamicContent(
+        <View>
+          <Text style={globalStyles.text}>Meeting Scheduled! {subject}</Text>
+          <Text style={globalStyles.text}>Title: {subject}</Text>
+          <Text style={globalStyles.text}>Duration: {duration} minutes</Text>
+          <Pressable
+            style={globalStyles.buttonDanger}
+            onPress={async () => {
+              await deleteCalendarEvent(eventId);
+              setDynamicContent(
+                <Text style={globalStyles.text}>Meeting Canceled</Text>
+              );
+            }}
+          >
+            <Text style={globalStyles.buttonText}>Cancel Meeting</Text>
+          </Pressable>
+        </View>
       );
     }
-  }
+  };
+
+  /** Make a phone call */
+  const makePhoneCall = async () => {
+    const phoneNumber = getPhoneNumber(contactName);
+    console.log("Calling:", contactName, "Phone Number:", phoneNumber);
+    if (!phoneNumber) {
+      Alert.alert("Error", "Phone number not found.");
+      return;
+    }
+    await Linking.openURL(`tel:${phoneNumber}`);
+  };
+
+  /** Display user's calendar events */
+  const showMySchedule = async () => {
+    const calendars = await getCalendars();
+    if (!calendars.length) {
+      Alert.alert("Error", "No calendars found.");
+      return;
+    }
+
+    const events = await getCalendarEvents(
+      calendars[6].id,
+      Date.now(),
+      Date.now() + 7 * 24 * 60 * 60 * 1000
+    );
+
+    setDynamicContent(
+      <ScrollView>
+        {events.map((event, index) => (
+          <Text style={globalStyles.text} key={index}>
+            {event.title} - {new Date(event.startDate).toLocaleString()}
+          </Text>
+        ))}
+      </ScrollView>
+    );
+  };
+
+  /** Send WhatsApp message */
+  const sendWhatsAppMessage = async () => {
+    const phoneNumber = getPhoneNumber(contactName);
+    if (!phoneNumber) {
+      Alert.alert("Error", "WhatsApp contact not found.");
+      return;
+    }
+    const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
+      body
+    )}`;
+    const canOpen = await Linking.canOpenURL(whatsappUrl);
+    if (canOpen) {
+      await Linking.openURL(whatsappUrl);
+    } else {
+      Alert.alert("Error", "WhatsApp is not installed on this device.");
+    }
+  };
+
+  /** Open a specific app */
+  const openAppByName = async () => {
+    const packageName = getAppPackage(appName);
+    console.log("Opening App:", appName, "Package:", packageName);
+    if (!packageName) {
+      Alert.alert("Error", `App "${appName}" is not installed.`);
+      return;
+    }
+    await openApp(packageName);
+  };
+
+  /** Set an alarm */
+  const setAlarm = () => {
+    setAlarmActive(true);
+    scheduleAlarm({
+      uid: "alarm1",
+      day: new Date(Date.now() + 10 * 1000),
+      title: "Wake Up!",
+      description: "This is an alarm reminder.",
+      snoozeInterval: 5,
+      repeating: false,
+      active: true,
+    });
+
+    // Auto-dismiss alarm in 15 seconds (5 sec after it rings)
+    setTimeout(() => {
+      callStopAlarm();
+    }, 15000); // 15,000ms = 15 seconds
+
+    setDynamicContent(
+      <View>
+        <Text style={globalStyles.text}>Alarm Set!</Text>
+        <Pressable onPress={callStopAlarm} style={globalStyles.buttonDanger}>
+          <Text style={globalStyles.buttonText}>Stop Alarm</Text>
+        </Pressable>
+      </View>
+    );
+  };
+
+  /** Stop an active alarm */
+  const callStopAlarm = () => {
+    stopAlarm();
+    removeAlarm("alarm1");
+    removeAllAlarms();
+    setAlarmActive(false);
+    setDynamicContent(<Text style={globalStyles.text}>Alarm Stopped</Text>);
+  };
+
+  /** Perform action based on type */
+  const actionPerformer = async () => {
+    switch (action) {
+      case "SendEmail":
+        await sendEmail();
+        break;
+      case "Call":
+        await makePhoneCall();
+        break;
+      case "OpenApp":
+        await openAppByName();
+        break;
+      case "Weather":
+        showWeather();
+        break;
+      case "TextWhatsApp":
+        await sendWhatsAppMessage();
+        break;
+      case "SummaryOfEmails":
+        await showEmailSummary();
+        break;
+      case "SetAlarm":
+      case "SetReminder":
+        setAlarm();
+        break;
+      case "CreateCalendarEvent":
+      case "ScheduleMeeting":
+        await scheduleMeeting();
+        break;
+      case "MySchedule":
+        await showMySchedule();
+        break;
+      default:
+        Alert.alert("Error", "This action is not supported.");
+        break;
+    }
+  };
+
+  // If `performActionAutomatically` is true, execute action immediately
+  useEffect(() => {
+    if (performActionAutomatically) {
+      actionPerformer();
+    }
+  }, [results]);
 
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Generated Result</Text>
       <ScrollView style={globalStyles.resultContainer}>
         <Text style={globalStyles.resultText}>{displayMessage}</Text>
+        {dynamicContent}
       </ScrollView>
-      <Text style={globalStyles.title}>Test Actions</Text>
-      <Pressable
-        style={globalStyles.button}
-        onPress={() => actionPerformer(action)}
-      >
-        <Text style={globalStyles.buttonText}>Perform Action</Text>
-      </Pressable>
+
+      {/* Show action button only if not auto-performing */}
+      {performActionAutomatically && (
+        <Pressable style={globalStyles.button} onPress={actionPerformer}>
+          <Text style={globalStyles.buttonText}>Perform Action</Text>
+        </Pressable>
+      )}
+
       <Pressable
         style={globalStyles.buttonSecondary}
         onPress={() => router.back()}

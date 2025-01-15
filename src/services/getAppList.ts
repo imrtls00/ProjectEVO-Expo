@@ -1,9 +1,19 @@
 import { InstalledApps, RNLauncherKitHelper } from 'react-native-launcher-kit';
 
-const appList = async () => {
+interface App {
+  packageName: string;
+  appName: string;
+  versionName: string;
+  versionCode: number;
+  firstInstallTime: number;
+  lastUpdateTime: number;
+  icon: string;
+}
+
+const appList = async (): Promise<App[]> => {
   try {
     // Fetch the list of installed apps
-    const apps = await InstalledApps.getSortedApps();
+    const apps: App[] = await InstalledApps.getSortedApps();
     return apps;
   } catch (error) {
     console.error('Error fetching app list:', error);
@@ -11,10 +21,10 @@ const appList = async () => {
   }
 };
 
-const openApp = async (packageName: string) => {
+const openApp = async (packageName: string): Promise<void> => {
   try {
     // Check if the package is installed
-    const isInstalled = await RNLauncherKitHelper.checkIfPackageInstalled(packageName);
+    const isInstalled: boolean = await RNLauncherKitHelper.checkIfPackageInstalled(packageName);
     if (isInstalled) {
       // Launch the app
       RNLauncherKitHelper.launchApplication(packageName);

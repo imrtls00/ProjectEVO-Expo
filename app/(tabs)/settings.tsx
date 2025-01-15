@@ -193,7 +193,8 @@ export default function SettingsScreen() {
         }
 
         const messageBody = await messageResponse.json();
-        return { ...message, body: messageBody };
+        const snippet = messageBody.snippet;
+        return { ...message, body: snippet };
       }));
       console.log("Fetched Emails:", completeEmails);
 
