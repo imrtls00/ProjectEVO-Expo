@@ -48,7 +48,7 @@ EVO is designed to simplify complex mobile interfaces by providing a natural lan
 
 ```bash
 git clone [repository-url]
-cd evo-assistant
+cd [project folder]
 ```
 
 2. Install dependencies:
@@ -62,9 +62,9 @@ yarn install
 3. Start the development server:
 
 ```bash
-npm start
+npm run android
 # or
-yarn start
+yarn run android
 ```
 
 ## 📱 Usage Examples
