@@ -41,6 +41,7 @@ EVO is designed to simplify complex mobile interfaces by providing a natural lan
 - npm or yarn
 - React Native development environment
 - Android Studio & SDK
+- Android Emulator or External Device configured with ADB.
 
 ### Installation
 
@@ -59,7 +60,7 @@ npm install
 yarn install
 ```
 
-3. Start the development server:
+3. Run the development build:
 
 ```bash
 npm run android
